@@ -58,8 +58,9 @@ nav a:hover, nav a.active {
 
 main {
     padding: 20px;
-    max-width: 800px;
     margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .tab-container {
@@ -273,5 +274,220 @@ canvas {
 
     canvas {
         height: 250px !important;
+    }
+}
+
+/* Reports styles */
+.reports-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.report-tab {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.report-tab:hover {
+    background-color: #e0e0e0;
+}
+
+.report-tab.active {
+    background-color: #007BFF;
+    color: white;
+}
+
+/* Report Type Selection */
+.report-type-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+/* Floating Filter Container */
+.filter-container {
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 500px;
+    transition: all 0.3s ease;
+}
+
+.filter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.filter-content h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.filter-select {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.filter-button {
+    padding: 12px 24px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Results Table Styling */
+.results-container {
+    margin: 30px auto;
+    width: 95%;
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#resultsTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+}
+
+#resultsTable th {
+    background: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+#resultsTable td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#resultsTable tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+#resultsTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+#resultsTable tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Column specific styling */
+#resultsTable td:nth-child(8) {
+    text-align: right;
+    font-family: 'Consolas', monospace;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+#resultsTable td:nth-child(9),
+#resultsTable td:nth-child(10),
+#resultsTable td:nth-child(11),
+#resultsTable td:nth-child(12) {
+    text-align: center;
+}
+
+/* Add borders to separate columns */
+#resultsTable th,
+#resultsTable td {
+    border-right: 1px solid #e9ecef;
+}
+
+#resultsTable th:last-child,
+#resultsTable td:last-child {
+    border-right: none;
+}
+
+/* Text overflow handling */
+#resultsTable td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Add tooltip on hover for truncated cells */
+#resultsTable td:hover {
+    position: relative;
+}
+
+#resultsTable td:hover::after {
+    content: attr(data-full-text);
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 2;
+    white-space: normal;
+    max-width: 300px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1200px) {
+    .results-container {
+        width: 100%;
+        margin: 20px 0;
+        border-radius: 0;
+    }
+    
+    #resultsTable {
+        font-size: 13px;
+    }
+    
+    #resultsTable th,
+    #resultsTable td {
+        padding: 10px 8px;
     }
 }
