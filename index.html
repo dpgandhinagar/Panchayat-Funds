@@ -38,15 +38,101 @@
             </div>
         </section>
         <section id="reports" class="tab-content" style="display: none;">
-            <h2>Reports</h2>
-            <p>View detailed reports and analytics here.</p>
+            <!-- Report Type Selection -->
+            <div class="report-type-container">
+                <button class="report-tab" data-report="taluka">Report by Taluka</button>
+                <button class="report-tab" data-report="village">Report by Village</button>
+                <button class="report-tab" data-report="scheme">Report by Scheme</button>
+                <button class="report-tab" data-report="year">Report by Year</button>
+            </div>
+
+            <!-- Replace floating container with normal container -->
+            <div id="filterContainer" class="filter-container">
+                <!-- Taluka Filter -->
+                <div id="talukaFilter" class="filter-content" style="display: none;">
+                    <h3>Select Taluka</h3>
+                    <select id="reportTalukaSelect" class="filter-select">
+                        <option value="" disabled selected>Choose a taluka</option>
+                        <option value="Gandhinagar">Gandhinagar</option>
+                        <option value="Mansa">Mansa</option>
+                        <option value="Dahegam">Dahegam</option>
+                        <option value="Kalol">Kalol</option>
+                    </select>
+                    <button class="filter-button" onclick="applyFilter('taluka')">Show Report</button>
+                </div>
+
+                <!-- Village Filter -->
+                <div id="villageFilter" class="filter-content" style="display: none;">
+                    <h3>Select Village</h3>
+                    <div class="filter-group">
+                        <select id="reportVillageTalukaSelect" class="filter-select">
+                            <option value="" disabled selected>Choose a taluka first</option>
+                            <option value="Gandhinagar">Gandhinagar</option>
+                            <option value="Mansa">Mansa</option>
+                            <option value="Dahegam">Dahegam</option>
+                            <option value="Kalol">Kalol</option>
+                        </select>
+                        <select id="reportVillageSelect" class="filter-select" disabled>
+                            <option value="" disabled selected>Select taluka first</option>
+                        </select>
+                    </div>
+                    <button class="filter-button" onclick="applyFilter('village')">Show Report</button>
+                </div>
+
+                <!-- Scheme Filter -->
+                <div id="schemeFilter" class="filter-content" style="display: none;">
+                    <h3>Select Scheme</h3>
+                    <select id="reportSchemeSelect" class="filter-select">
+                        <option value="" disabled selected>Choose a scheme</option>
+                        <option value="finance_commission">Finance Commission Scheme</option>
+                        <option value="stamp_duty">Stamp Duty Scheme</option>
+                        <option value="sand_gravel">Sand Gravel Scheme</option>
+                    </select>
+                    <button class="filter-button" onclick="applyFilter('scheme')">Show Report</button>
+                </div>
+
+                <!-- Year Filter -->
+                <div id="yearFilter" class="filter-content" style="display: none;">
+                    <h3>Select Year</h3>
+                    <select id="reportYearSelect" class="filter-select">
+                        <option value="" disabled selected>Choose a year</option>
+                        <option value="2024">2024</option>
+                        <option value="2025">2025</option>
+                    </select>
+                    <button class="filter-button" onclick="applyFilter('year')">Show Report</button>
+                </div>
+            </div>
+
+            <!-- Results Container -->
+            <div id="resultsContainer" class="results-container" style="display: none;">
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Scheme</th>
+                            <th>Year</th>
+                            <th>Work ID</th>
+                            <th>Taluka</th>
+                            <th>Village</th>
+                            <th>Work Type</th>
+                            <th>Work Name</th>
+                            <th>Amount</th>
+                            <th>Primary Approval</th>
+                            <th>Technical Approval</th>
+                            <th>Administrative Approval</th>
+                            <th>Completion Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
         </section>
     </main>
     <footer>
-        <p>&copy; 2025 . All rights reserved.</p>
+        <p>&copy; 2025 My Web Project. All rights reserved.</p>
     </footer>
     <!-- Add type="module" to use ES6 imports -->
     <script type="module" src="dashboard.js"></script>
     <script src="app.js"></script>
+    <script type="module" src="reports.js"></script>
 </body>
 </html>
