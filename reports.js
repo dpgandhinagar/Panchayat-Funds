@@ -168,6 +168,17 @@ async function applyFilter(filterType) {
     }
 }
 
+// Update the formatDate function
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }).replace(/\//g, '-');
+}
+
 // Update the displayResults function
 function displayResults(data) {
     const resultsContainer = document.querySelector('.results-container');
@@ -203,10 +214,10 @@ function displayResults(data) {
             <td>₹${amount.toLocaleString('en-IN', {
                 maximumFractionDigits: 2
             })}</td>
-            <td>${row.primary_approval_date || ''}</td>
-            <td>${row.technical_approval_date || ''}</td>
-            <td>${row.administrative_approval_date || ''}</td>
-            <td>${row.work_completion_date || ''}</td>
+            <td>${formatDate(row.primary_approval_date)}</td>
+            <td>${formatDate(row.technical_approval_date)}</td>
+            <td>${formatDate(row.administrative_approval_date)}</td>
+            <td>${formatDate(row.work_completion_date)}</td>
         `;
         resultsBody.appendChild(tr);
     });
@@ -242,11 +253,6 @@ function formatWorkType(type) {
         'drainage_work': 'Drainage Work'
     };
     return types[type] || type;
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString();
 }
 
 // Make applyFilter function globally available
