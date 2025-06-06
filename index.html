@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Project</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Add Chart.js before your other scripts -->
+    <!-- Add this before your other scripts -->
+    <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-gujarati/index.css" rel="stylesheet">
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- Other Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <header>
@@ -52,6 +59,7 @@
                 <button class="report-tab" data-report="village">Report by Village</button>
                 <button class="report-tab" data-report="scheme">Report by Scheme</button>
                 <button class="report-tab" data-report="year">Report by Year</button>
+                <button class="report-tab" data-report="taluka_scheme">By Taluka & Scheme</button>
             </div>
 
             <!-- Replace floating container with normal container -->
@@ -109,6 +117,25 @@
                     </select>
                     <button class="filter-button" onclick="applyFilter('year')">Show Report</button>
                 </div>
+
+                <!-- Taluka & Scheme Filter -->
+                <div id="taluka_schemeFilter" class="filter-content" style="display: none;">
+                    <h3>Select Taluka and Scheme</h3>
+                    <select id="reportTalukaSchemeSelect" class="filter-select" required>
+                        <option value="" disabled selected>Select Taluka</option>
+                        <option value="Gandhinagar">Gandhinagar</option>
+                        <option value="Mansa">Mansa</option>
+                        <option value="Dahegam">Dahegam</option>
+                        <option value="Kalol">Kalol</option>
+                    </select>
+                    <select id="reportSchemeTalukaSelect" class="filter-select" required>
+                        <option value="" disabled selected>Select Scheme</option>
+                        <option value="finance_commission">Finance Commission Scheme</option>
+                        <option value="stamp_duty">Stamp Duty Scheme</option>
+                        <option value="sand_gravel">Sand Gravel Scheme</option>
+                    </select>
+                    <button class="filter-button" onclick="applyFilter('taluka_scheme')">Show Report</button>
+                </div>
             </div>
 
             <!-- Results Container -->
@@ -135,6 +162,10 @@
                         <!-- Total row will be inserted here -->
                     </tfoot>
                 </table>
+                <div class="download-buttons">
+                    <button id="downloadPDF" class="download-btn">Print Report</button>
+                    <button id="downloadExcel" class="download-btn">Download Excel</button>
+                </div>
             </div>
         </section>
     </main>
@@ -145,5 +176,7 @@
     <script type="module" src="dashboard.js"></script>
     <script src="app.js"></script>
     <script type="module" src="reports.js"></script>
+</body>
+</html></script>
 </body>
 </html>
