@@ -488,3 +488,73 @@ function displayResults(data) {
 
     resultsContainer.innerHTML = tableHTML;
 }
+
+function downloadAsPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(16);
+    doc.text('Work Details Report', 14, 15);
+    
+    // Get table data
+    const headers = [
+        ['Scheme', 'Year', 'Work ID', 'Taluka', 'Village', 'Work Type', 'Work Name', 
+         'Amount', 'Primary Approval', 'Technical Approval', 'Administrative Approval', 'Work Completion']
+    ];
+    
+    const data = Array.from(document.querySelectorAll('#resultsTable tbody tr')).map(row => {
+        return Array.from(row.cells).map(cell => cell.textContent);
+    });
+
+    // Add total row
+    const totalAmount = document.querySelector('.total-amount').textContent;
+    data.push(['Total Amount', '', '', '', '', '', '', totalAmount, '', '', '', '']);
+
+    // Generate PDF
+    doc.autoTable({
+        head: headers,
+        body: data,
+        startY: 25,
+        styles: { fontSize: 8 },
+        columnStyles: { 7: { halign: 'right' } }
+    });
+
+    // Save PDF
+    doc.save('work_details_report.pdf');
+}
+
+function downloadAsExcel() {
+    // Get table data
+    const data = [
+        ['Scheme', 'Year', 'Work ID', 'Taluka', 'Village', 'Work Type', 'Work Name', 
+         'Amount', 'Primary Approval', 'Technical Approval', 'Administrative Approval', 'Work Completion']
+    ];
+    
+    // Add row data
+    document.querySelectorAll('#resultsTable tbody tr').forEach(row => {
+        const rowData = Array.from(row.cells).map(cell => cell.textContent);
+        data.push(rowData);
+    });
+
+    // Add total row
+    const totalAmount = document.querySelector('.total-amount').textContent;
+    data.push(['Total Amount', '', '', '', '', '', '', totalAmount, '', '', '', '']);
+
+    // Create workbook
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Work Details');
+
+    // Save Excel file
+    XLSX.writeFile(wb, 'work_details_report.xlsx');
+}
+
+// Add event listeners after DOM content is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    const pdfBtn = document.getElementById('downloadPDF');
+    const excelBtn = document.getElementById('downloadExcel');
+    
+    if (pdfBtn) pdfBtn.addEventListener('click', downloadAsPDF);
+    if (excelBtn) excelBtn.addEventListener('click', downloadAsExcel);
+});
