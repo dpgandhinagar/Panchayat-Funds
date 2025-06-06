@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         const { data, error } = await supabase
             .from('work_details')
-            .select('count(*)', { count: 'exact' });
+            .select('*')
+            .limit(1);
         
         if (error) throw error;
         console.log('Successfully connected to Supabase');
@@ -243,6 +244,19 @@ function generateTalukaOptions(selectedTaluka) {
 }
 
 function populateEditForm(data) {
+    if (!data || !data.id) {
+        console.error('Invalid data received:', data);
+        alert('Error: Invalid data received');
+        return;
+    }
+
+    // Format dates for input fields
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    };
+
     editForm.innerHTML = `
         <h2>Edit Work Details</h2>
         <input type="hidden" id="editId" value="${data.id}">
@@ -284,26 +298,34 @@ function populateEditForm(data) {
         <input type="number" id="editAmount" name="amount" value="${data.amount}" required>
 
         <label for="editPrimaryApprovalDate">Primary Approval Date:</label>
-        <input type="date" id="editPrimaryApprovalDate" name="primary_approval_date" value="${data.primary_approval_date}" required>
+        <input type="date" id="editPrimaryApprovalDate" name="primary_approval_date" 
+            value="${formatDateForInput(data.primary_approval_date)}" required>
 
         <label for="editTechnicalApprovalDate">Technical Approval Date:</label>
-        <input type="date" id="editTechnicalApprovalDate" name="technical_approval_date" value="${data.technical_approval_date || ''}">
+        <input type="date" id="editTechnicalApprovalDate" name="technical_approval_date" 
+            value="${formatDateForInput(data.technical_approval_date)}">
 
         <label for="editAdministrativeApprovalDate">Administrative Approval Date:</label>
-        <input type="date" id="editAdministrativeApprovalDate" name="administrative_approval_date" value="${data.administrative_approval_date || ''}">
+        <input type="date" id="editAdministrativeApprovalDate" name="administrative_approval_date" 
+            value="${formatDateForInput(data.administrative_approval_date)}">
 
         <label for="editWorkCompletionDate">Work Completion Date:</label>
-        <input type="date" id="editWorkCompletionDate" name="work_completion_date" value="${data.work_completion_date || ''}">
+        <input type="date" id="editWorkCompletionDate" name="work_completion_date" 
+            value="${formatDateForInput(data.work_completion_date)}">
 
         <button type="submit">Update Details</button>
         <button type="button" onclick="cancelEdit()">Cancel</button>
     `;
 
-    // Add event listener for taluka change in edit form
+    // Add error handling for form elements
     const editTalukaSelect = document.getElementById('editTalukaName');
-    editTalukaSelect.addEventListener('change', function() {
-        updateVillages(this.value);
-    });
+    if (editTalukaSelect) {
+        editTalukaSelect.addEventListener('change', function() {
+            updateVillages(this.value);
+        });
+    } else {
+        console.error('Taluka select element not found');
+    }
 }
 
 // Add cancel function
@@ -319,7 +341,17 @@ async function handleEditSubmit(e) {
     submitButton.textContent = 'Updating...';
     
     try {
-        const formData = {
+        const id = document.getElementById('editId').value;
+        if (!id) throw new Error('No record ID found');
+
+        // Format dates properly
+        const formatDateForDB = (dateString) => {
+            if (!dateString || dateString.trim() === '') return null;
+            return dateString; // Keep original format YYYY-MM-DD
+        };
+
+        // Get all form values
+        const updateData = {
             scheme: document.getElementById('editScheme').value,
             year: document.getElementById('editYear').value,
             work_id: document.getElementById('editWorkId').value,
@@ -328,27 +360,131 @@ async function handleEditSubmit(e) {
             work_type: document.getElementById('editWorkType').value,
             work_name: document.getElementById('editWorkName').value,
             amount: parseFloat(document.getElementById('editAmount').value),
-            primary_approval_date: document.getElementById('editPrimaryApprovalDate').value,
-            technical_approval_date: document.getElementById('editTechnicalApprovalDate').value || null,
-            administrative_approval_date: document.getElementById('editAdministrativeApprovalDate').value || null,
-            work_completion_date: document.getElementById('editWorkCompletionDate').value || null
+            primary_approval_date: formatDateForDB(document.getElementById('editPrimaryApprovalDate').value),
+            technical_approval_date: formatDateForDB(document.getElementById('editTechnicalApprovalDate').value),
+            administrative_approval_date: formatDateForDB(document.getElementById('editAdministrativeApprovalDate').value),
+            work_completion_date: formatDateForDB(document.getElementById('editWorkCompletionDate').value)
         };
 
-        const { error } = await supabase
-            .from('work_details')
-            .update(formData)
-            .eq('id', document.getElementById('editId').value);
+        console.log('Record ID to update:', id);
+        console.log('Update data being sent:', updateData);
 
-        if (error) throw error;
+        // Perform update
+        const { data, error } = await supabase
+            .from('work_details')
+            .update(updateData)
+            .eq('id', id)
+            .select();
+
+        if (error) {
+            console.error('Supabase update error:', error);
+            throw error;
+        }
+
+        console.log('Updated record:', data);
+
+        // Verify the update immediately
+        const { data: verifyData, error: verifyError } = await supabase
+            .from('work_details')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (verifyError) {
+            console.error('Verification error:', verifyError);
+            throw verifyError;
+        }
+
+        console.log('Verification data:', verifyData);
+
+        if (!verifyData) {
+            throw new Error('Failed to verify update - no data returned');
+        }
 
         alert('Work details updated successfully!');
         document.getElementById('editForm').style.display = 'none';
         document.getElementById('searchForm').reset();
+
     } catch (error) {
         console.error('Update error:', error);
-        alert(`Failed to update data: ${error.message}`);
+        alert(`Failed to update: ${error.message}`);
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Update Details';
     }
+}
+
+function displayResults(data) {
+    const resultsContainer = document.querySelector('.results-container');
+    if (!data || data.length === 0) {
+        resultsContainer.innerHTML = '<p>No results found</p>';
+        return;
+    }
+
+    // Calculate total amount
+    const totalAmount = data.reduce((sum, row) => sum + (parseFloat(row.amount) || 0), 0);
+
+    let tableHTML = `
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Scheme</th>
+                    <th>Year</th>
+                    <th>Work ID</th>
+                    <th>Taluka</th>
+                    <th>Village</th>
+                    <th>Work Type</th>
+                    <th>Work Name</th>
+                    <th>Amount</th>
+                    <th>Primary Approval</th>
+                    <th>Technical Approval</th>
+                    <th>Administrative Approval</th>
+                    <th>Work Completion</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    // Add data rows
+    data.forEach(row => {
+        tableHTML += `
+            <tr>
+                <td>${row.scheme || ''}</td>
+                <td>${row.year || ''}</td>
+                <td>${row.work_id || ''}</td>
+                <td>${row.taluka_name || ''}</td>
+                <td>${row.village_name || ''}</td>
+                <td>${row.work_type || ''}</td>
+                <td>${row.work_name || ''}</td>
+                <td>${row.amount ? row.amount.toLocaleString('en-IN', {
+                    maximumFractionDigits: 2,
+                    style: 'currency',
+                    currency: 'INR'
+                }) : ''}</td>
+                <td>${row.primary_approval_date || ''}</td>
+                <td>${row.technical_approval_date || ''}</td>
+                <td>${row.administrative_approval_date || ''}</td>
+                <td>${row.work_completion_date || ''}</td>
+            </tr>
+        `;
+    });
+
+    // Add total row in footer
+    tableHTML += `
+            </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="7" style="text-align: right;"><strong>Total Amount:</strong></td>
+                    <td class="total-amount">${totalAmount.toLocaleString('en-IN', {
+                        maximumFractionDigits: 2,
+                        style: 'currency',
+                        currency: 'INR'
+                    })}</td>
+                    <td colspan="4"></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
+
+    resultsContainer.innerHTML = tableHTML;
 }
