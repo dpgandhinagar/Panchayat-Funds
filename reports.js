@@ -154,40 +154,56 @@ async function applyFilter(filterType) {
 
 // Update the displayResults function
 function displayResults(data) {
-    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsContainer = document.querySelector('.results-container');
     const resultsBody = document.getElementById('resultsBody');
-    
-    resultsBody.innerHTML = '';
-    
-    if (data.length === 0) {
-        alert('No results found for the selected criteria.');
+    const resultsTotalRow = document.getElementById('resultsTotalRow');
+
+    if (!data || data.length === 0) {
+        resultsContainer.style.display = 'none';
+        alert('No results found');
         return;
     }
-    
+
+    resultsContainer.style.display = 'block';
+    resultsBody.innerHTML = '';
+
+    // Calculate total amount
+    let totalAmount = 0;
+
+    // Display data rows
     data.forEach(row => {
+        const amount = parseFloat(row.amount) || 0;
+        totalAmount += amount;
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${formatScheme(row.scheme)}</td>
-            <td>${row.year}</td>
-            <td>${row.work_id}</td>
-            <td>${row.taluka_name}</td>
-            <td>${row.village_name}</td>
-            <td>${formatWorkType(row.work_type)}</td>
-            <td>${row.work_name}</td>
-            <td>₹${row.amount.toLocaleString()}</td>
-            <td>${formatDate(row.primary_approval_date)}</td>
-            <td>${formatDate(row.technical_approval_date)}</td>
-            <td>${formatDate(row.administrative_approval_date)}</td>
-            <td>${formatDate(row.work_completion_date)}</td>
+            <td>${row.scheme || ''}</td>
+            <td>${row.year || ''}</td>
+            <td>${row.work_id || ''}</td>
+            <td>${row.taluka_name || ''}</td>
+            <td>${row.village_name || ''}</td>
+            <td>${row.work_type || ''}</td>
+            <td>${row.work_name || ''}</td>
+            <td>₹${amount.toLocaleString('en-IN', {
+                maximumFractionDigits: 2
+            })}</td>
+            <td>${row.primary_approval_date || ''}</td>
+            <td>${row.technical_approval_date || ''}</td>
+            <td>${row.administrative_approval_date || ''}</td>
+            <td>${row.work_completion_date || ''}</td>
         `;
         resultsBody.appendChild(tr);
     });
 
-    // Show results container
-    resultsContainer.style.display = 'block';
-    
-    // Log success
-    console.log('Results displayed successfully:', data.length, 'records');
+    // Display total row
+    resultsTotalRow.innerHTML = `
+        <tr class="total-row">
+            <td colspan="7" style="text-align: right;"><strong>Total Amount:</strong></td>
+            <td colspan="5"><strong>₹${totalAmount.toLocaleString('en-IN', {
+                maximumFractionDigits: 2
+            })}</strong></td>
+        </tr>
+    `;
 }
 
 // Helper functions for formatting
