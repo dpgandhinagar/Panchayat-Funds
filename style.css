@@ -386,92 +386,96 @@ canvas {
 
 #resultsTable {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 14px;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+#resultsTable th,
+#resultsTable td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    /* Enable text wrapping */
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 200px; /* Adjust based on your needs */
 }
 
 #resultsTable th {
-    background: #f8f9fa;
-    color: #2c3e50;
-    font-weight: 600;
-    padding: 16px 12px;
-    text-align: left;
-    border-bottom: 2px solid #dee2e6;
+    background-color: #f4f4f4;
+    font-weight: bold;
     position: sticky;
     top: 0;
     z-index: 1;
 }
 
-#resultsTable td {
-    padding: 14px 12px;
-    border-bottom: 1px solid #e9ecef;
+/* Add horizontal scrolling for very wide tables */
+.results-container {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px;
 }
 
-#resultsTable tbody tr {
-    transition: background-color 0.3s ease;
+/* Hover effect for better readability */
+#resultsTable tr:hover {
+    background-color: #f8f8f8;
 }
 
-#resultsTable tbody tr:hover {
-    background-color: #f8f9fa;
+/* Specific column widths */
+#resultsTable td:nth-child(7) { /* Work Name column */
+    min-width: 200px;
+    max-width: 300px;
 }
 
-#resultsTable tbody tr:nth-child(even) {
-    background-color: #fafafa;
+#resultsTable td:nth-child(1), /* Scheme column */
+#resultsTable td:nth-child(2), /* Year column */
+#resultsTable td:nth-child(3) { /* Work ID column */
+    min-width: 100px;
 }
 
-/* Column specific styling */
-#resultsTable td:nth-child(8) {
-    text-align: right;
-    font-family: 'Consolas', monospace;
-    font-weight: 500;
-    color: #2c3e50;
-}
-
+/* Date columns */
 #resultsTable td:nth-child(9),
 #resultsTable td:nth-child(10),
 #resultsTable td:nth-child(11),
 #resultsTable td:nth-child(12) {
-    text-align: center;
+    min-width: 120px;
 }
 
-/* Add borders to separate columns */
-#resultsTable th,
-#resultsTable td {
-    border-right: 1px solid #e9ecef;
+/* Add these styles after your existing #resultsTable styles */
+
+#resultsTable tfoot {
+    border-top: 2px solid #007BFF;
+    font-weight: bold;
+    background-color: #f0f7ff;
 }
 
-#resultsTable th:last-child,
-#resultsTable td:last-child {
-    border-right: none;
+#resultsTable tfoot td {
+    padding: 15px 12px;
+    color: #333;
 }
 
-/* Text overflow handling */
-#resultsTable td {
-    max-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.total-row {
+    font-size: 1.1em;
 }
 
-/* Add tooltip on hover for truncated cells */
-#resultsTable td:hover {
-    position: relative;
+.total-amount {
+    color: #007BFF;
 }
 
-#resultsTable td:hover::after {
-    content: attr(data-full-text);
-    position: absolute;
-    left: 0;
-    top: 100%;
-    background: #333;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    z-index: 2;
-    white-space: normal;
-    max-width: 300px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+/* Add these styles for the total row */
+.total-row {
+    background-color: #f0f7ff;
+    font-size: 1.1em;
+    border-top: 2px solid #007BFF;
+}
+
+.total-row td {
+    padding: 15px 12px;
+    color: #333;
+}
+
+.total-row strong {
+    color: #007BFF;
 }
 
 /* Responsive adjustments */
@@ -490,4 +494,27 @@ canvas {
     #resultsTable td {
         padding: 10px 8px;
     }
+}
+
+/* Home button styles */
+.home-button-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.home-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+    background-color: #0056b3;
 }
