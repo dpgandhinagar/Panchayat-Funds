@@ -47,46 +47,54 @@ function processChartData(data, groupByField) {
     };
 }
 
-function createBarChart(ctx, labels, data, title) {
+function createBarChart(canvasId, labels, data, title) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    
+    // Destroy existing chart if it exists
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+        existingChart.destroy();
+    }
+
+    // Create new chart
     return new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Amount Allocated',
+                label: 'Amount',
                 data: data,
-                backgroundColor: [
-                    'rgba(54, 162, 235, 0.7)',
-                    'rgba(255, 99, 132, 0.7)',
-                    'rgba(75, 192, 192, 0.7)',
-                    'rgba(255, 206, 86, 0.7)'
-                ],
-                borderColor: [
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(255, 206, 86, 1)'
-                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: title
-                },
-                legend: {
-                    display: false
-                }
-            },
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Amount (₹)'
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        }
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: title,
+                    font: {
+                        size: 16
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return '₹' + context.raw.toLocaleString('en-IN');
+                        }
                     }
                 }
             }
@@ -129,59 +137,48 @@ function createPieChart(ctx, labels, data, title) {
 }
 
 async function initializeDashboard() {
-    console.log('Initializing dashboard...'); // Debug log
-
-    const data = await fetchDashboardData();
-    if (!data) {
-        console.error('No data received from fetchDashboardData');
-        return;
-    }
-
-    console.log('Received data:', data); // Debug log
-
     try {
-        // Process data for each chart
-        const talukaChart = processChartData(data.talukaData, 'taluka_name');
-        const workTypeChart = processChartData(data.workTypeData, 'work_type');
-        const schemeChart = processChartData(data.schemeData, 'scheme');
-
-        console.log('Processed chart data:', { talukaChart, workTypeChart, schemeChart }); // Debug log
-
-        // Get chart contexts
-        const talukaCtx = document.getElementById('talukaChart');
-        const workTypeCtx = document.getElementById('workTypeChart');
-        const schemeCtx = document.getElementById('schemeChart');
-
-        if (!talukaCtx || !workTypeCtx || !schemeCtx) {
-            console.error('One or more chart containers not found');
+        const data = await fetchDashboardData();
+        if (!data) {
+            console.error('No data received');
             return;
         }
 
-        // Create charts
-        createBarChart(
-            talukaCtx,
-            talukaChart.labels,
-            talukaChart.values,
+        console.log('Raw data:', data); // Debug data
+
+        // Process data for charts
+        const talukaData = processChartData(data.talukaData, 'taluka_name');
+        const workTypeData = processChartData(data.workTypeData, 'work_type');
+        const schemeData = processChartData(data.schemeData, 'scheme');
+
+        console.log('Processed data:', { talukaData, workTypeData, schemeData }); // Debug processed data
+
+        // Create charts with clean canvas
+        document.getElementById('talukaChart').innerHTML = '';
+        document.getElementById('workTypeChart').innerHTML = '';
+        document.getElementById('schemeChart').innerHTML = '';
+
+        // Create new charts
+        createBarChart('talukaChart', 
+            talukaData.labels, 
+            talukaData.values, 
             'Amount Allocated by Taluka'
         );
 
-        createPieChart(
-            workTypeCtx,
-            workTypeChart.labels,
-            workTypeChart.values,
-            'Amount Allocated by Work Type'
+        createPieChart('workTypeChart', 
+            workTypeData.labels, 
+            workTypeData.values, 
+            'Amount by Work Type'
         );
 
-        createBarChart(
-            schemeCtx,
-            schemeChart.labels,
-            schemeChart.values,
+        createBarChart('schemeChart', 
+            schemeData.labels, 
+            schemeData.values, 
             'Amount Allocated by Scheme'
         );
 
-        console.log('Charts created successfully'); // Debug log
     } catch (error) {
-        console.error('Error creating charts:', error);
+        console.error('Dashboard initialization error:', error);
     }
 }
 
@@ -192,4 +189,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Update dashboard when switching to the dashboard tab
-document.querySelector('a[data-target="dashboard"]').addEventListener('click', initializeDashboard);
+document.querySelector('a[data-target="dashboard"]').addEventListener('click', () => {
+    // Clear existing charts
+    const charts = ['talukaChart', 'workTypeChart', 'schemeChart'];
+    charts.forEach(chartId => {
+        const canvas = document.getElementById(chartId);
+        const existingChart = Chart.getChart(canvas);
+        if (existingChart) {
+            existingChart.destroy();
+        }
+    });
+    
+    // Initialize new charts
+    initializeDashboard();
+});
