@@ -96,8 +96,11 @@ function updateVillageOptions(selectedTaluka, villageSelect) {
 // Handle filter application
 async function applyFilter(filterType) {
     try {
-        console.log('Applying filter for:', filterType); // Debug log
-        let query = supabase.from('work_details').select('*');
+        console.log('Applying filter for:', filterType);
+        let query = supabase
+            .from('work_details')
+            .select('*')
+            .order('work_id', { ascending: true });
 
         switch (filterType) {
             case 'village':
@@ -132,9 +135,22 @@ async function applyFilter(filterType) {
                 }
                 query = query.eq('year', year);
                 break;
+            case 'taluka_scheme':
+                const selectedTaluka = document.getElementById('reportTalukaSchemeSelect').value;
+                const selectedScheme = document.getElementById('reportSchemeTalukaSelect').value;
+                
+                if (!selectedTaluka || !selectedScheme) {
+                    alert('Please select both Taluka and Scheme');
+                    return;
+                }
+                
+                query = query
+                    .eq('taluka_name', selectedTaluka)
+                    .eq('scheme', selectedScheme);
+                break;
         }
 
-        console.log('Fetching data...'); // Debug log
+        console.log('Fetching data...');
         const { data, error } = await query;
 
         if (error) throw error;
@@ -144,7 +160,7 @@ async function applyFilter(filterType) {
             return;
         }
 
-        console.log('Data fetched successfully:', data.length, 'records'); // Debug log
+        console.log('Data fetched successfully:', data.length, 'records');
         displayResults(data);
     } catch (error) {
         console.error('Error fetching results:', error);
@@ -204,6 +220,9 @@ function displayResults(data) {
             })}</strong></td>
         </tr>
     `;
+
+    // Initialize download buttons after displaying results
+    initializeDownloadButtons();
 }
 
 // Helper functions for formatting
@@ -232,3 +251,286 @@ function formatDate(dateString) {
 
 // Make applyFilter function globally available
 window.applyFilter = applyFilter;
+
+// Initialize download buttons
+function initializeDownloadButtons() {
+    const printButton = document.getElementById('downloadPDF'); // Keep same ID for now
+    const excelButton = document.getElementById('downloadExcel');
+
+    if (printButton) {
+        printButton.removeEventListener('click', printResults);
+        printButton.addEventListener('click', printResults);
+        // Update button text
+        printButton.textContent = 'Print Report';
+    }
+
+    if (excelButton) {
+        excelButton.removeEventListener('click', downloadAsExcel);
+        excelButton.addEventListener('click', downloadAsExcel);
+    }
+}
+
+// Add this to ensure buttons are initialized when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+    initializeDownloadButtons();
+});
+
+// Remove the downloadAsPDF function and replace with printResults
+function printResults() {
+    try {
+        // Store current document body
+        const originalBody = document.body.innerHTML;
+        
+        // Get the table
+        const table = document.getElementById('resultsTable');
+        if (!table) {
+            throw new Error('No data to print');
+        }
+
+        // Get the current filter type and selection
+        let reportTitle = 'Work Details Report';
+        const activeTab = document.querySelector('.report-tab.active');
+        if (activeTab) {
+            const filterType = activeTab.dataset.report;
+            let selection = '';
+            
+            switch (filterType) {
+                case 'village':
+                    selection = document.getElementById('reportVillageSelect').options[
+                        document.getElementById('reportVillageSelect').selectedIndex
+                    ].text;
+                    reportTitle = `Village-wise Report: ${selection}`;
+                    break;
+                case 'taluka':
+                    selection = document.getElementById('reportTalukaSelect').options[
+                        document.getElementById('reportTalukaSelect').selectedIndex
+                    ].text;
+                    reportTitle = `Taluka-wise Report: ${selection}`;
+                    break;
+                case 'scheme':
+                    selection = document.getElementById('reportSchemeSelect').options[
+                        document.getElementById('reportSchemeSelect').selectedIndex
+                    ].text;
+                    reportTitle = `Scheme-wise Report: ${selection}`;
+                    break;
+                case 'year':
+                    selection = document.getElementById('reportYearSelect').options[
+                        document.getElementById('reportYearSelect').selectedIndex
+                    ].text;
+                    reportTitle = `Year-wise Report: ${selection}`;
+                    break;
+                case 'taluka_scheme':
+                    const taluka = document.getElementById('reportTalukaSchemeSelect').options[
+                        document.getElementById('reportTalukaSchemeSelect').selectedIndex
+                    ].text;
+                    const scheme = document.getElementById('reportSchemeTalukaSelect').options[
+                        document.getElementById('reportSchemeTalukaSelect').selectedIndex
+                    ].text;
+                    reportTitle = `Taluka & Scheme Report: ${taluka} - ${scheme}`;
+                    break;
+            }
+        }
+
+        // Create print-friendly view
+        const printContent = `
+            <html>
+                <head>
+                    <title>${reportTitle}</title>
+                    <style>
+                        @page {
+                            size: landscape;
+                            margin: 10mm;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 15px;
+                        }
+                        h2 {
+                            text-align: center;
+                            color: #2980b9;
+                            margin-bottom: 20px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-bottom: 1em;
+                            font-size: 12px;
+                        }
+                        th, td { 
+                            border: 1px solid #ddd; 
+                            padding: 6px; 
+                            text-align: left;
+                            overflow-wrap: break-word;
+                        }
+                        th { 
+                            background-color: #2980b9; 
+                            color: white;
+                            white-space: nowrap;
+                        }
+                        .total-row {
+                            background-color: #f0f7ff;
+                            font-weight: bold;
+                        }
+                        .total-row td {
+                            border-top: 2px solid #2980b9;
+                        }
+                        td:nth-child(8) {
+                            text-align: right;
+                        }
+                        @media print {
+                            table { page-break-inside: auto; }
+                            tr { page-break-inside: avoid; }
+                            thead { display: table-header-group; }
+                            tfoot { display: table-footer-group; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h2>${reportTitle}</h2>
+                    ${table.outerHTML}
+                </body>
+            </html>
+        `;
+
+        // Replace document content with print content
+        document.body.innerHTML = printContent;
+        
+        // Print
+        window.print();
+        
+        // Restore original content after print dialog closes
+        document.body.innerHTML = originalBody;
+        
+        // Reattach event listeners
+        initializeDownloadButtons();
+
+    } catch (error) {
+        console.error('Print error:', error);
+        alert('Error printing. Please try again.');
+    }
+}
+
+// Add event listener for the download button
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadBtn = document.getElementById('downloadPDF');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', printResults);
+    }
+});
+
+async function downloadAsExcel() {
+    try {
+        // Get report title based on active filter
+        let reportTitle = 'Work Details Report';
+        const activeTab = document.querySelector('.report-tab.active');
+        if (activeTab) {
+            const filterType = activeTab.dataset.report;
+            switch (filterType) {
+                case 'village':
+                    reportTitle = `Village-wise Report: ${document.getElementById('reportVillageSelect').selectedOptions[0].text}`;
+                    break;
+                case 'taluka':
+                    reportTitle = `Taluka-wise Report: ${document.getElementById('reportTalukaSelect').selectedOptions[0].text}`;
+                    break;
+                case 'scheme':
+                    reportTitle = `Scheme-wise Report: ${document.getElementById('reportSchemeSelect').selectedOptions[0].text}`;
+                    break;
+                case 'year':
+                    reportTitle = `Year-wise Report: ${document.getElementById('reportYearSelect').selectedOptions[0].text}`;
+                    break;
+                case 'taluka_scheme':
+                    const taluka = document.getElementById('reportTalukaSchemeSelect').selectedOptions[0].text;
+                    const scheme = document.getElementById('reportSchemeTalukaSelect').selectedOptions[0].text;
+                    reportTitle = `Taluka & Scheme Report: ${taluka} - ${scheme}`;
+                    break;
+            }
+        }
+
+        // Get table data
+        const table = document.getElementById('resultsTable');
+        if (!table) throw new Error('No data to export');
+
+        // Create workbook and worksheet
+        const wb = XLSX.utils.book_new();
+        
+        // Get headers and data
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+        const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => 
+            Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+        );
+        const totalRow = Array.from(table.querySelector('.total-row').querySelectorAll('td')).map(td => td.textContent);
+
+        // Combine all data
+        const wsData = [[reportTitle], [], headers, ...rows, totalRow];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Set column widths
+        ws['!cols'] = [
+            {wch: 20}, {wch: 8}, {wch: 10}, {wch: 15}, {wch: 20}, 
+            {wch: 15}, {wch: 45}, {wch: 15}, {wch: 12}, {wch: 12}, 
+            {wch: 12}, {wch: 12}
+        ];
+
+        // Style the cells
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        
+        for (let R = 0; R <= range.e.r; R++) {
+            for (let C = 0; C <= range.e.c; C++) {
+                const cellRef = XLSX.utils.encode_cell({r: R, c: C});
+                if (!ws[cellRef]) {
+                    // Create empty cell if it doesn't exist to ensure borders
+                    ws[cellRef] = { v: '', t: 's' };
+                }
+
+                // Apply styles to all cells
+                ws[cellRef].s = {
+                    border: {
+                        top: { style: 'medium', color: { rgb: "000000" } },
+                        bottom: { style: 'medium', color: { rgb: "000000" } },
+                        left: { style: 'medium', color: { rgb: "000000" } },
+                        right: { style: 'medium', color: { rgb: "000000" } }
+                    },
+                    font: { name: 'Arial', sz: 11 },
+                    alignment: {
+                        vertical: 'center',
+                        horizontal: C === 7 ? 'right' : 'left', // Right align amount column
+                        wrapText: true
+                    }
+                };
+
+                // Title row styling
+                if (R === 0) {
+                    ws[cellRef].s.font = { bold: true, sz: 14 };
+                }
+                // Header row styling
+                else if (R === 2) {
+                    ws[cellRef].s.fill = {
+                        patternType: 'solid',
+                        fgColor: { rgb: "CCCCCC" }
+                    };
+                    ws[cellRef].s.font = { ...ws[cellRef].s.font, bold: true };
+                }
+                // Total row styling
+                else if (R === range.e.r) {
+                    ws[cellRef].s.font = { ...ws[cellRef].s.font, bold: true };
+                    ws[cellRef].s.fill = {
+                        patternType: 'solid',
+                        fgColor: { rgb: "F0F7FF" }
+                    };
+                }
+            }
+        }
+
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Work Details');
+
+        // Save file with timestamp
+        const timestamp = new Date().toLocaleString('en-IN').replace(/[/:]/g, '-');
+        const filename = `work_details_report_${timestamp}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+    } catch (error) {
+        console.error('Excel generation error:', error);
+        alert('Error generating Excel file. Please try again.');
+    }
+}
