@@ -1,3 +1,8 @@
+import { protectRoute } from './routeGuard.js';
+
+// Protect data entry page
+protectRoute(['admin', 'user']);
+
 document.addEventListener('DOMContentLoaded', function () {
     const tabs = document.querySelectorAll('.tab');
     const contents = document.querySelectorAll('.tab-content');
