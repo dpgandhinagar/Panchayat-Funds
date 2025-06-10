@@ -596,10 +596,10 @@ canvas {
     background-color: #2980b9;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .auth-btn:hover {
