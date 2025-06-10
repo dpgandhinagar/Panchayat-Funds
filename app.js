@@ -34,4 +34,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show the first tab's content by default
     tabs[0].click();
+
+    // Check authentication status
+    checkAuthStatus();
+    
+    // Auth button click handler
+    document.getElementById('authButton').addEventListener('click', handleAuth);
 });
+
+function checkAuthStatus() {
+    const user = sessionStorage.getItem('auth_session');
+    const authButton = document.getElementById('authButton');
+    const userInfo = document.getElementById('userInfo');
+    const dataEntryLink = document.querySelector('.auth-required');
+
+    if (user) {
+        // User is logged in
+        const userData = JSON.parse(user);
+        document.getElementById('userName').textContent = userData.username;
+        userInfo.style.display = 'inline';
+        authButton.textContent = 'Logout';
+        
+        // Show data entry link
+        if (dataEntryLink) {
+            dataEntryLink.style.display = '';
+        }
+    } else {
+        // User is not logged in
+        userInfo.style.display = 'none';
+        authButton.textContent = 'Login';
+        
+        // Hide data entry link
+        if (dataEntryLink) {
+            dataEntryLink.style.display = 'none';
+        }
+    }
+}
+
+function handleAuth() {
+    const user = sessionStorage.getItem('auth_session');
+    
+    if (user) {
+        // Logout
+        sessionStorage.removeItem('auth_session');
+        checkAuthStatus();
+    } else {
+        // Redirect to login page
+        window.location.href = 'auth.html';
+    }
+}
+
+// Make handleAuth available globally
+window.handleAuth = handleAuth;
+
+// Add logout functionality
+function logout() {
+    sessionStorage.removeItem('auth_session');
+    window.location.href = 'login.html';
+}
+
+// Add auth check to data entry page access
+function checkDataEntryAccess() {
+    const user = sessionStorage.getItem('auth_session');
+    if (!user && window.location.href.includes('data-entry.html')) {
+        alert('Please login to access data entry.');
+        window.location.href = 'index.html';
+    }
+}
