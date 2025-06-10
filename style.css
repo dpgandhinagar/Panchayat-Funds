@@ -17,11 +17,51 @@ header {
     padding: 0;
 }
 
-header .header-image {
-    max-width: 100%; /* Ensure the image fits within the container */
-    height: auto; /* Maintain the aspect ratio */
-    display: block; /* Remove any inline spacing issues */
-    margin: 0 auto; /* Center the image */
+.header-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    min-height: 350px;
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+.header-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../../assets/img1.jpeg'); /* Updated path */
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5;
+    z-index: 1;
+    height: 100%; /* Ensure full height coverage */
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column; /* Changed to column layout */
+    align-items: center; /* Center horizontally */
+    justify-content: flex-start; /* Align to top */
+    padding: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 450px; /* Match container height */
+}
+
+/* Remove conflicting header-image styles and combine them */
+.header-image {
+    height: auto; /* Let height adjust automatically */
+    max-width: 100%;
+   /* width: 800px; *//* Set a specific width */
+    max-width: 100%; /* Ensure responsiveness */
+    z-index: 3;
+    margin: 20px 0; /* Add vertical spacing */
+    display: block;
+    object-fit: contain; /* Preserve aspect ratio */
 }
 
 header h1 {
@@ -33,6 +73,9 @@ header h1 {
     padding: 10px 20px;
     border-radius: 5px;
     text-align: center;
+    color: #2980b9;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
 }
 
 nav {
@@ -546,16 +589,17 @@ canvas {
     display: flex;
     align-items: center;
     gap: 15px;
+    z-index: 3;
 }
 
 .auth-btn {
     background-color: #2980b9;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .auth-btn:hover {
