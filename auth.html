@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Panchayat Funds Monitor</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+        }
+        .auth-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .auth-logo {
+            width: 120px;
+            height: auto;
+            margin: 0 auto 1.5rem;
+            display: block;
+        }
+        .auth-form {
+            margin-top: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .auth-submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .auth-submit-btn:hover {
+            background-color: #2471a3;
+        }
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin: 1rem 0;
+            display: none;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #2980b9;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <img src="../assets/img.jpg" alt="Logo" class="auth-logo">
+        <h1 style="text-align: center; color: #2980b9; margin-bottom: 1rem;">Panchayat Funds Monitor</h1>
+        
+        <div id="authError" class="error-message"></div>
+        
+        <form id="authForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="auth-submit-btn">Login</button>
+        </form>
+        
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/+esm'
+
+        const supabaseUrl = 'https://jyailcsclxjzcnyrnsic.supabase.co'
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5YWlsY3NjbHhqemNueXJuc2ljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4MjM1OTksImV4cCI6MjA2MTM5OTU5OX0.TVh104V8SnfeRTWywzYU96j-7uKtbzX6Tf8kjQbPwKk'
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('authError');
+            const submitBtn = document.querySelector('.auth-submit-btn');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Logging in...';
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Query the users table
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
+                if (error) throw error;
+
+                if (user) {
+                    // Store session data
+                    sessionStorage.setItem('auth_session', JSON.stringify({
+                        id: user.id,
+                        username: user.username,
+                        role: user.role
+                    }));
+                    
+                    // Get return URL or default to index
+                    const params = new URLSearchParams(window.location.search);
+                    const returnUrl = params.get('returnUrl') || 'index.html';
+                    window.location.href = returnUrl;
+                } else {
+                    errorDiv.textContent = 'Invalid username or password';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
+                errorDiv.textContent = 'Authentication failed. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+    </script>
+</body>
+</html>
