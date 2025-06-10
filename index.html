@@ -18,12 +18,15 @@
     <script type="module" src="app.js"></script>
 </head>
 <body>
-    <header>
-        <img src="img.jpg" alt="Header Image" class="header-image">
-        <h1>PANCHAYAT FUNDS MONITOR</h1>
-        <div class="auth-section">
-            <span id="userInfo" style="display: none;">Welcome, <span id="userName"></span></span>
-            <button id="authButton" class="auth-btn" onclick="handleAuth()">Login</button>
+    <header class="header-container">
+        <div class="header-background"></div>
+        <div class="header-content">
+            <img src="img.jpg" alt="Header Image" class="header-image">
+            <h1>PANCHAYAT FUNDS MONITOR</h1>
+            <div class="auth-section">
+                <span id="userInfo" style="display: none;">Welcome, <span id="userName"></span></span>
+                <button id="authButton" class="auth-btn" onclick="handleAuth()">Login</button>
+            </div>
         </div>
     </header>
 
