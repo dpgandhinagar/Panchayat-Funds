@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gandhinagar DP</title>
+    <title>Web Project</title>
     <link rel="stylesheet" href="style.css">
     <!-- Add this before your other scripts -->
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-gujarati/index.css" rel="stylesheet">
@@ -15,18 +15,23 @@
     <!-- Other Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="app.js"></script>
 </head>
 <body>
     <header>
-        
         <img src="img.jpg" alt="Header Image" class="header-image">
-        
         <h1>PANCHAYAT FUNDS MONITOR</h1>
+        <div class="auth-section">
+            <span id="userInfo" style="display: none;">Welcome, <span id="userName"></span></span>
+            <button id="authButton" class="auth-btn" onclick="handleAuth()">Login</button>
+        </div>
     </header>
+
     <nav>
         <a href="#" class="tab active" data-target="dashboard">Dashboard</a>
-        <a href="data-entry.html" class="tab">Data Entry</a> <!-- Link to the new form page -->
         <a href="#" class="tab" data-target="reports">Reports</a>
+        <!-- Data entry link only visible when logged in -->
+        <a href="data-entry.html" class="tab auth-required" style="display: none;">Data Entry</a>
     </nav>
     <main>
         <section id="dashboard" class="tab-content active">
@@ -174,9 +179,7 @@
     </footer>
     <!-- Add type="module" to use ES6 imports -->
     <script type="module" src="dashboard.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
     <script type="module" src="reports.js"></script>
-</body>
-</html></script>
 </body>
 </html>
