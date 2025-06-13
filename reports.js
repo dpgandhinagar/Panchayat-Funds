@@ -100,7 +100,7 @@ async function applyFilter(filterType) {
         let query = supabase
             .from('work_details')
             .select('*')
-            .order('work_id', { ascending: true });
+            .order('year', { ascending: true });  // First sort by year
 
         switch (filterType) {
             case 'village':
@@ -160,7 +160,19 @@ async function applyFilter(filterType) {
             return;
         }
 
-        console.log('Data fetched successfully:', data.length, 'records');
+        // Sort data by work_id after fetching
+        data.sort((a, b) => {
+            // First compare by year
+            if (a.year !== b.year) {
+                return a.year - b.year;
+            }
+            // If same year, compare work_ids
+            const workIdA = parseInt(a.work_id.replace(/\D/g, '')) || 0;
+            const workIdB = parseInt(b.work_id.replace(/\D/g, '')) || 0;
+            return workIdA - workIdB;
+        });
+
+        console.log('Data fetched and sorted:', data.length, 'records');
         displayResults(data);
     } catch (error) {
         console.error('Error fetching results:', error);
@@ -538,5 +550,108 @@ async function downloadAsExcel() {
     } catch (error) {
         console.error('Excel generation error:', error);
         alert('Error generating Excel file. Please try again.');
+    }
+}
+
+// Create work type donut chart
+async function createWorkTypeChart() {
+    try {
+        const { data, error } = await supabase
+            .from('work_details')
+            .select('work_type');
+
+        if (error) throw error;
+
+        // Count work types
+        const workTypeCounts = data.reduce((acc, curr) => {
+            acc[curr.work_type] = (acc[curr.work_type] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Calculate percentages
+        const total = Object.values(workTypeCounts).reduce((a, b) => a + b, 0);
+        const percentages = {};
+        Object.keys(workTypeCounts).forEach(type => {
+            percentages[type] = ((workTypeCounts[type] / total) * 100).toFixed(1);
+        });
+
+        // Define distinct colors
+        const colors = [
+            '#FF6B6B', // Bright Red
+            '#4ECDC4', // Turquoise
+            '#45B7D1', // Sky Blue
+            '#96CEB4', // Sage Green
+            '#FFEEAD', // Light Yellow
+            '#D4A5A5', // Dusty Rose
+            '#9FA8DA', // Periwinkle
+            '#FFD93D'  // Golden Yellow
+        ];
+
+        const ctx = document.getElementById('workTypeChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(workTypeCounts).map(type => 
+                    `${formatWorkType(type)} (${percentages[type]}%)`
+                ),
+                datasets: [{
+                    data: Object.values(workTypeCounts),
+                    backgroundColor: colors.slice(0, Object.keys(workTypeCounts).length),
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `${label} (${value} works)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(data.datasets[0].data[i]),
+                                            lineCap: 'round',
+                                            lineDash: [],
+                                            lineDashOffset: 0,
+                                            lineJoin: 'round',
+                                            lineWidth: 1,
+                                            strokeStyle: '#ffffff',
+                                            borderRadius: 2
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return ` ${value} works (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error('Error creating work type chart:', error);
     }
 }
