@@ -16,6 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script type="module" src="app.js"></script>
+
+    <!-- Add this line near the top of your head section -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
     <header class="header-container">
@@ -48,13 +51,13 @@
                 </div>
                 <div class="chart-wrapper">
                     <h3>Work Type Distribution</h3>
-                    <div class="chart-container">
+                    <div class="chart-container" style="height: 400px; position: relative;">
                         <canvas id="workTypeChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-wrapper">
                     <h3>Scheme-wise Allocation</h3>
-                    <div class="chart-container">
+                    <div class="chart-container" style="height: 200px; position: relative;">
                         <canvas id="schemeChart"></canvas>
                     </div>
                 </div>
@@ -183,6 +186,9 @@
     <!-- Add type="module" to use ES6 imports -->
     <script type="module" src="dashboard.js"></script>
     <script type="module" src="app.js"></script>
+    <script type="module" src="reports.js"></script>
+</body>
+</html>
     <script type="module" src="reports.js"></script>
 </body>
 </html>
