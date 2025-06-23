@@ -243,6 +243,29 @@ function generateTalukaOptions(selectedTaluka) {
         .join('');
 }
 
+const workTypes = [
+    { value: "cc-road", label: "CC Road" },
+    { value: "paver-block", label: "Paver Block" },
+    { value: "drainage-line", label: "Drainage Work" },
+    { value: "Compound-wall", label: "Compound Wall" },
+    { value: "crematorium", label: "Crematorium" },
+    { value: "borewell", label: "Borewell" },
+    { value: "Water Pipeline", label: "Water Pipeline" },
+    { value: "Protection-wall", label: "Protection-wall" },
+    { value: "GEM-Portal", label: "GEM-Portal" },
+
+    { value: "shed", label:"Shed"},
+    { value: "other", label: "Other" }
+    // Add more as needed
+];
+
+// Helper to generate work type options
+function generateWorkTypeOptions(selectedType) {
+    return workTypes.map(
+        t => `<option value="${t.value}" ${t.value === selectedType ? 'selected' : ''}>${t.label}</option>`
+    ).join('');
+}
+
 function populateEditForm(data) {
     if (!data || !data.id) {
         console.error('Invalid data received:', data);
@@ -281,14 +304,12 @@ function populateEditForm(data) {
 
         <label for="editVillageName">Village Name:</label>
         <select id="editVillageName" name="village_name" required>
-            <option value="${data.village_name}" selected>${data.village_name}</option>
+            <!-- Options will be populated dynamically -->
         </select>
 
         <label for="editWorkType">Work Type:</label>
         <select id="editWorkType" name="work_type" required>
-            <option value="cc_road" ${data.work_type === 'cc_road' ? 'selected' : ''}>CC Road</option>
-            <option value="paver_block" ${data.work_type === 'paver_block' ? 'selected' : ''}>Paver Block</option>
-            <option value="drainage_work" ${data.work_type === 'drainage_work' ? 'selected' : ''}>Drainage Work</option>
+            ${generateWorkTypeOptions(data.work_type)}
         </select>
 
         <label for="editWorkName">Work Name:</label>
@@ -317,11 +338,14 @@ function populateEditForm(data) {
         <button type="button" onclick="cancelEdit()">Cancel</button>
     `;
 
-    // Add error handling for form elements
+    // Populate villages for the selected taluka and set the selected village
+    updateVillages(data.taluka_name, 'editVillageName', data.village_name);
+
+    // Add event listener for taluka change to update villages
     const editTalukaSelect = document.getElementById('editTalukaName');
     if (editTalukaSelect) {
         editTalukaSelect.addEventListener('change', function() {
-            updateVillages(this.value);
+            updateVillages(this.value, 'editVillageName');
         });
     } else {
         console.error('Taluka select element not found');
@@ -548,6 +572,57 @@ function downloadAsExcel() {
 
     // Save Excel file
     XLSX.writeFile(wb, 'work_details_report.xlsx');
+}
+
+// Move these outside DOMContentLoaded so they are accessible globally
+const villagesByTaluka = {
+    'Gandhinagar': ["Adalaj","Adraj Moti","Alampur","Bhoyan Rathod","Bhundiya -Dharampur","Chandrala","Chekhalarani","Chhala","Chiloda - Dabhoda",
+"Dabhoda","Dantali","Dashela","Dhanap","Dolarana Vasana", "Galudan","Giyod","Isanpur Mota","Jakhora - Rajpur","Jalund","Jamiyatpur",
+"Kakanu Tarapur","Kanpur","Lavarpur","Lekawada","Limbadia-Karai","Madhavgadh","Magodi","Mahudara","Medra","Motipura","Mubarakpura",
+"Palaj","Pindharada","Piplaj","Pirojpur","Prantiya","Pundarasan","Raipur","Ranasan","Ratanpur","Rupal","Sadra","Sardhav","Shahpur","Shertha","Shiholi Moti","Sonarda","Sonipur",
+"Tarapur","Titoda","Unava","Uvarsad","Vadodara","Vaja Pura","Valad","Vankanerda","Vasan","Vira Talavdi",],
+    'Mansa': ["Ajarapura","Ajol","Aluva","Amaja","Amarapur","Amarpura (Kh)","Ambod","Anandpura Ambod","Anandpura (Solaiya)","Anandpura Veda",
+"Anguthala","Anodiya","Badpura","Baliyanagar (M)","Balva","Bapupura","Bhimpura (M)","Bilodra","Boru","Chadasna","Chandisana","Charada",
+"Delvad","Dhameda","Dhendhu","Dholakuva","Dodipal","Fatehpura","Galthara","Govindpura (Samo)","Gulabpura","Gunma","Hanumanpura (Samau)",
+"Harna Hoda","Himmatpura (B)","Himmatpura (L)","Indrapura","Iswerpura","Itadra","Itla","Jamla","Khadat","Kharna","Khata Aamba",
+"Kotvas","Kunvadara","Lakroda","Limbodara","Lodra","Mahudi","Makakhad","Mandali(V)","Manekpura (Makakhad)","Maninagar (Soja)",
+"Motipura (Veda)","Nadri","Padusma","Paladi Rathod","Paladi (Vyas)","Parbatpura","Parsa","Patanpura","Pratap Nagar","Pratappura (Balva)",
+"Pratappura (Piyaj)","Prempura Veda","Pundhara","Rajpura","Rampura","Rangpur","Ridrol","Samou","Sobhasan","Soja","Solaiya",
+"Umiyanagar","Umiyanagar (B)","Vagosana","Varsoda","Veda","Vihar","Vijayanagar"],
+    'Kalol': ["Adhana","Arsodiya","Bhadol","Bhavpura","Bhimasan","Bhoyan Moti","Bileshvarpura","Borisana","Chhatral","Dantali",
+"Dhamasna","Dhanaj","Dhanot","Dingucha","Ganpatpura","Golthara","Govindpura (Veda)","Hajipur","Himmatpura (Veda)","Isand","Jaspur",
+"Jethlaj","Kantha","Karoli","Khatrajdabhi","Khoraj","Mokhasan","Mulasana","Moti-Bhoyan","Nandoli","Nardipur","Nasmed","Nava","Ola","Paliyad",
+"Palodiya","Palsana","Pansar","Piyaj","Rakanpur","Ramnagar","Rancharada","Ranchhodpura","Sabaspur","Saij","Sanavad","Santej",
+"Sherisa","Unali","Usmanabad","Vadavsvami","Vadsar","Vansajada Dhedia","Vansajada (K)","Vayana","Veda"
+],
+    'Dahegam': ["Aantroli","Ahamadpur","Amrajina Muvada","Antoli","Arajanjina Muvada","Babra","Badpur","Bahiyal","Bardoli (Bariya)",
+"Bardoli (Kothi)","Bariya","Bhadroda","Bilamana","Chamla","Chekhlapagi","Chiskari","Demaliya","Devkaran Na Muvada","Dhaniyol",
+"Dharisana","Dod","Dolatpura","Dumecha","Ghamij","Halisa","Harakhjina Muvada","Harsoli-Jivajini Muvadi","Harsoli-Jivajini Muvadi","Hathijan",
+"Hilol","Hilol Vasna","Isanpur Dodiya","Jaliya Math","Jalundra Mota","Jalundra Nana","Jesa Chandna Muvada","Jindva","Jindva",
+"Jivraj Na Muvada","Kadadara","Kadjodra","Kalyanji Na Muvada","Kamalbandh Vasna","Kanipur","Kantharpur","Karoli","Khadiya - Thadakuva",
+"Khadiya - Thadakuva","Khakhara","Khanpur","Kodrali","Krishnanagar","Lakha Na Muvada","Lavad","Lihoda","Mahudiya","Mirapur","Mithana Muvada",
+"Morali","Mosampur","Moti-Nani Machhang","Moti-Nani Machhang","Motipura","Motipura","Nagjina Muvada","Nandol","Narnavat (Khapreswar)",
+"Navanagar","Ottampur","Pahadiya","Pahadiya","Palaiya","Pallano Math","Palundra","Panana Muvada","Pasuniya","Patna Kuva","Pavthi-Najupura",
+"Pavthi-Najupura","Pavthi-Najupura","Piplaj","Rakhiyal","Ramnagar","Sagdalpur","Sahebji Na Muvada","Salki","Sametri","Sampa",
+"Sanoda","Shiyapura","Shiyavada","Udan","Vadod","Vadvasa","Vardhana Muvada","Vasana Chaudhary","Vasna Rathod","Vasna Sogthi",
+"Vatva","Velpura","Zalana Muvada","Zank"]
+};
+
+function updateVillages(selectedTaluka, villageSelectId, selectedVillage = '') {
+    const villageSelect = document.getElementById(villageSelectId);
+    if (!villageSelect) return;
+
+    villageSelect.innerHTML = '<option value="" disabled>Select a village</option>';
+
+    if (selectedTaluka && villagesByTaluka[selectedTaluka]) {
+        villagesByTaluka[selectedTaluka].forEach(village => {
+            const option = document.createElement('option');
+            option.value = village;
+            option.textContent = village;
+            if (village === selectedVillage) option.selected = true;
+            villageSelect.appendChild(option);
+        });
+    }
 }
 
 // Add event listeners after DOM content is loaded
