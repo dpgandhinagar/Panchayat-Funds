@@ -250,7 +250,7 @@ const workTypes = [
     { value: "Compound-wall", label: "Compound Wall" },
     { value: "crematorium", label: "Crematorium" },
     { value: "borewell", label: "Borewell" },
-    { value: "Water Pipeline", label: "Water Pipeline" },
+    { value: "water-Pipeline", label: "water-Pipeline" },
     { value: "Protection-wall", label: "Protection-wall" },
     { value: "GEM-Portal", label: "GEM-Portal" },
 
