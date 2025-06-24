@@ -255,7 +255,7 @@ const workTypes = [
     { value: "GEM-Portal", label: "GEM-Portal" },
 
     { value: "shed", label:"Shed"},
-    { value: "other", label: "Other" }
+    { value: "others", label: "Others" }
     // Add more as needed
 ];
 
