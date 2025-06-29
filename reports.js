@@ -252,9 +252,9 @@ function displayResults(data) {
 function formatScheme(scheme) {
     const schemes = {
         'finance_commission': 'Finance Commission',
-        'stamp_duty': 'Stamp Duty',
+        'stamp_duty' : 'Stamp Duty' ,
         'sand_gravel': 'Sand Gravel' ,
-        'President': 'President DP grant',
+        'President'  : 'President DP grant',
         'Vice-President': 'Vice-President DP grant',
         'Exec chairman ': 'Executive chairman DP grant'
     };
