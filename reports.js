@@ -254,6 +254,9 @@ function formatScheme(scheme) {
         'finance_commission': 'Finance Commission',
         'stamp_duty': 'Stamp Duty',
         'sand_gravel': 'Sand Gravel'
+        'President': 'President DP grant',
+        'Vice-President ': 'Vice-President DP grant',
+        'Exec chairman ': 'Executive chairman DP grant'
     };
     return schemes[scheme] || scheme;
 }
