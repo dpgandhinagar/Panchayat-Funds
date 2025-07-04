@@ -64,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
             filterContents.forEach(content => {
                 content.style.display = 'none';
             });
-            document.getElementById(`${filterType}Filter`).style.display = 'block';
+            const filterEl = document.getElementById(`${filterType}Filter`);
+            if (filterEl) filterEl.style.display = 'block';
 
             // Hide results when switching tabs
             document.getElementById('resultsContainer').style.display = 'none';
