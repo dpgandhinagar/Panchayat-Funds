@@ -624,3 +624,16 @@ canvas {
 .logout-btn:hover {
     background-color: #c0392b;
 }
+
+/* Highlight active pendency tab */
+.pendency-tab.active {
+    background-color: #2980b9;
+    color: #fff;
+    border-bottom: 2px solid #2471a3;
+    font-weight: bold;
+}
+
+#pendencyFilterContainer,
+#pendencyFilter {
+    display: block !important;
+}
