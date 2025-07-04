@@ -36,8 +36,8 @@
     <nav>
         <a href="#" class="tab active" data-target="dashboard">Dashboard</a>
         <a href="#" class="tab" data-target="reports">Reports</a>
-        <!-- Data entry link only visible when logged in -->
         <a href="data-entry.html" class="tab auth-required" style="display: none;">Data Entry</a>
+        <a href="#" class="tab auth-required" data-target="pendencyReports" style="display: none;">Pendency Reports</a>
     </nav>
     <main>
         <section id="dashboard" class="tab-content active">
@@ -185,6 +185,64 @@
                 </div>
             </div>
         </section>
+        <section id="pendencyReports" class="tab-content" style="display: none;">
+    <div class="report-type-container">
+        <button class="report-tab" data-pendency="technical">Pending Technical Approvals</button>
+        <button class="report-tab" data-pendency="administrative">Pending Administrative Approvals</button>
+        <button class="report-tab" data-pendency="completion">Pending Work Completion</button>
+    </div>
+    <div id="pendencyFilterContainer" class="filter-container">
+        <div id="pendencyFilter" class="filter-content">
+            <h3>Select Filters</h3>
+            <select id="pendencySchemeSelect" class="filter-select">
+                <option value="" disabled selected>Select Scheme</option>
+                <option value="finance_commission">Finance Commission Scheme</option>
+                <option value="stamp_duty">Stamp Duty Scheme</option>
+                <option value="sand_gravel">Sand Gravel Scheme</option>
+                <option value="President">President DP Grant</option>
+                <option value="Vice-President">Vice President DP Grant</option>
+                <option value="Exec chairman">Executive Chairman DP Grant</option>
+            </select>
+            <select id="pendencyYearSelect" class="filter-select">
+                <option value="" disabled selected>Select Year</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+            </select>
+            <select id="pendencyTalukaSelect" class="filter-select">
+                <option value="" disabled selected>Select Taluka</option>
+                <option value="Gandhinagar">Gandhinagar</option>
+                <option value="Mansa">Mansa</option>
+                <option value="Dahegam">Dahegam</option>
+                <option value="Kalol">Kalol</option>
+            </select>
+            <button class="filter-button" id="pendencyShowBtn">Show Pendency</button>
+        </div>
+    </div>
+    <div id="pendencyResultsContainer" class="results-container" style="display: none;">
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Scheme</th>
+                <th>Year</th>
+                <th>Work ID</th>
+                <th>Taluka</th>
+                <th>Village</th>
+                <th>Work Type</th>
+                <th>Work Name</th>
+                <th>Amount</th>
+                <th>Primary Approval</th>
+                <th>Technical Approval</th>
+                <th>Administrative Approval</th>
+                <th>Completion Date</th>
+            </tr>
+        </thead>
+        <tbody id="pendencyResultsBody"></tbody>
+    </table>
+    <div class="download-buttons">
+        <button id="printPendencyReport" class="download-btn">Print Report</button>
+    </div>
+</div>
+</section>
     </main>
     <footer>
         <p>&copy; 2025 An Initiative by District Panchayat, Gandhinagar. All rights reserved.</p>
@@ -192,9 +250,6 @@
     <!-- Add type="module" to use ES6 imports -->
     <script type="module" src="dashboard.js"></script>
     <script type="module" src="app.js"></script>
-    <script type="module" src="reports.js"></script>
-</body>
-</html>
     <script type="module" src="reports.js"></script>
 </body>
 </html>
