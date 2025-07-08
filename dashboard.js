@@ -66,8 +66,8 @@ async function createTalukaChart() {
             .map(([taluka, amt]) => `${taluka}: ₹${(amt / 1e7).toFixed(2)} Cr`)
             .join('</br>');
         document.getElementById('talukaChartSummary').innerHTML = `
-            <strong><u>Analysis:</u></strong>
-            <span style="font-size:0.97em;">${talukaNames}</span>
+            <strong><u><center>Allocation(in Crores):</u></strong>
+            <span style="font-size:0.97em;">${talukaNames}</span></center>
         `;
     } catch (error) {
         console.error('Error creating taluka chart:', error);
