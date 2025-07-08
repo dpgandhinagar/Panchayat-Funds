@@ -659,3 +659,18 @@ async function createWorkTypeChart() {
         console.error('Error creating work type chart:', error);
     }
 }
+
+// Show the scheme filter when "Report by Scheme" is selected
+document.querySelectorAll('.report-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        // Hide all filter contents
+        document.querySelectorAll('.filter-content').forEach(fc => fc.style.display = 'none');
+        // Show the relevant filter
+        if (this.dataset.report === 'scheme') {
+            document.getElementById('schemeFilter').style.display = 'block';
+        }
+        // ...handle other report types...
+    });
+});
+
+window.displayResults = displayResults;
