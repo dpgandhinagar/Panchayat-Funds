@@ -78,6 +78,40 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Selected taluka:', selectedTaluka);
         updateVillageOptions(selectedTaluka, reportVillageSelect);
     });
+
+    // Show year dropdown and submit button after scheme is selected
+    const schemeSelect = document.getElementById('reportSchemeSelect');
+    const yearSelect = document.getElementById('reportSchemeYearSelect');
+    const schemeBtn = document.getElementById('schemeReportBtn');
+
+    if (schemeSelect && yearSelect && schemeBtn) {
+        schemeSelect.addEventListener('change', function() {
+            if (schemeSelect.value) {
+                yearSelect.style.display = '';
+                schemeBtn.style.display = '';
+            } else {
+                yearSelect.style.display = 'none';
+                schemeBtn.style.display = 'none';
+            }
+        });
+
+        // Optionally, disable button until year is selected
+        yearSelect.addEventListener('change', function() {
+            schemeBtn.disabled = !yearSelect.value;
+        });
+
+        // Handle report generation for scheme+year
+        schemeBtn.addEventListener('click', function() {
+            const scheme = schemeSelect.value;
+            const year = yearSelect.value;
+            if (!scheme || !year) {
+                alert('Please select both scheme and year.');
+                return;
+            }
+            // Call your filter function for scheme+year
+            applySchemeYearReport(scheme, year);
+        });
+    }
 });
 
 // Update village options based on selected taluka
@@ -167,7 +201,7 @@ async function applyFilter(filterType) {
             if (a.year !== b.year) {
                 return a.year - b.year;
             }
-            // If same year, compare work_ids
+            // If same year, compare work_ids numerically
             const workIdA = parseInt(a.work_id.replace(/\D/g, '')) || 0;
             const workIdB = parseInt(b.work_id.replace(/\D/g, '')) || 0;
             return workIdA - workIdB;
@@ -674,3 +708,28 @@ document.querySelectorAll('.report-tab').forEach(tab => {
 });
 
 window.displayResults = displayResults;
+
+// Add this function to fetch and display the report for scheme+year
+async function applySchemeYearReport(scheme, year) {
+    try {
+        let query = supabase
+            .from('work_details')
+            .select('*')
+            .eq('scheme', scheme)
+            .eq('year', year);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        // Sort numerically by work_id
+        data.sort((a, b) => {
+            const workIdA = parseInt(a.work_id.replace(/\D/g, '')) || 0;
+            const workIdB = parseInt(b.work_id.replace(/\D/g, '')) || 0;
+            return workIdA - workIdB;
+        });
+
+        displayResults(data);
+    } catch (error) {
+        alert('Failed to fetch results: ' + error.message);
+    }
+}
