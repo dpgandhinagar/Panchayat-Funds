@@ -83,8 +83,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         let query = supabase.from('work_details').select('*')
             .eq('scheme', scheme)
-            .eq('year', year)
-            .eq('taluka_name', taluka);
+            .eq('year', year);
+
+        // Only filter by taluka if not ALL
+        if (taluka !== 'ALL') {
+            query = query.eq('taluka_name', taluka);
+        }
 
         // Add pendency filter
         if (currentPendencyType === 'technical') {
@@ -160,7 +164,58 @@ document.addEventListener('DOMContentLoaded', function() {
         win.document.close();
         win.print();
     });
+
+    // Show year dropdown after scheme is selected
+    const schemeSelect = document.getElementById('reportSchemeSelect');
+    const yearSelect = document.getElementById('reportSchemeYearSelect');
+    const schemeBtn = document.getElementById('schemeReportBtn');
+
+    if (schemeSelect && yearSelect && schemeBtn) {
+        schemeSelect.addEventListener('change', function() {
+            if (schemeSelect.value) {
+                yearSelect.style.display = '';
+                schemeBtn.style.display = '';
+            } else {
+                yearSelect.style.display = 'none';
+                schemeBtn.style.display = 'none';
+            }
+        });
+
+        // Optionally, hide button until year is selected
+        yearSelect.addEventListener('change', function() {
+            schemeBtn.disabled = !yearSelect.value;
+        });
+
+        // Handle report generation for scheme+year
+        schemeBtn.addEventListener('click', function() {
+            const scheme = schemeSelect.value;
+            const year = yearSelect.value;
+            if (!scheme || !year) {
+                alert('Please select both scheme and year.');
+                return;
+            }
+            // Call your report function here, e.g.:
+            applySchemeYearReport(scheme, year);
+        });
+    }
 });
+
+// Add this function to fetch and display the report
+function applySchemeYearReport(scheme, year) {
+    // Example using Supabase
+    supabase.from('work_details')
+        .select('*')
+        .eq('scheme', scheme)
+        .eq('year', year)
+        .then(({ data, error }) => {
+            if (error) {
+                alert('Error fetching data: ' + error.message);
+                return;
+            }
+            // Replace this with your table rendering logic
+            displayResults(data || []);
+        });
+}
 
 function checkAuthStatus() {
     const user = sessionStorage.getItem('auth_session');
