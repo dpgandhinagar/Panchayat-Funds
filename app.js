@@ -139,10 +139,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${row.work_type || ''}</td>
                 <td>${row.work_name || ''}</td>
                 <td>₹${parseFloat(row.amount || 0).toLocaleString('en-IN')}</td>
-                <td>${row.primary_approval_date || ''}</td>
-                <td>${row.technical_approval_date || ''}</td>
-                <td>${row.administrative_approval_date || ''}</td>
-                <td>${row.work_completion_date || ''}</td>
+                <td>${formatDate(row.primary_approval_date)}</td>
+                <td>${formatDate(row.technical_approval_date)}</td>
+                <td>${formatDate(row.administrative_approval_date)}</td>
+                <td>${formatDate(row.work_completion_date)}</td>
             `;
             body.appendChild(tr);
         });
@@ -272,3 +272,14 @@ function checkDataEntryAccess() {
         window.location.href = 'index.html';
     }
 }
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric' // <-- Use full year
+    }).replace(/\//g, '-');
+}
+
