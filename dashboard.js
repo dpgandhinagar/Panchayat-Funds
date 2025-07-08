@@ -60,6 +60,15 @@ async function createTalukaChart() {
                 }
             }
         });
+
+        // Generate summary
+        const talukaNames = Object.entries(talukaData)
+            .map(([taluka, amt]) => `${taluka}: ₹${(amt / 1e7).toFixed(2)} Cr`)
+            .join(', ');
+        document.getElementById('talukaChartSummary').innerHTML = `
+            <strong>Analysis:</strong> Taluka-wise allocation of grants.<br>
+            <span style="font-size:0.97em;">${talukaNames}</span>
+        `;
     } catch (error) {
         console.error('Error creating taluka chart:', error);
     }
@@ -69,29 +78,41 @@ async function createWorkTypeChart() {
     try {
         const { data, error } = await supabase
             .from('work_details')
-            .select('work_type');
+            .select('work_type, amount');
 
         if (error) throw error;
 
-        // Count work types
-        const workTypeCounts = data.reduce((acc, curr) => {
-            acc[curr.work_type] = (acc[curr.work_type] || 0) + 1;
+        // Aggregate data by work type
+        const workTypeData = data.reduce((acc, curr) => {
+            acc[curr.work_type] = (acc[curr.work_type] || 0) + parseFloat(curr.amount || 0);
             return acc;
         }, {});
 
         const colors = [
             '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', 
-            '#FFEEAD', '#D4A5A5', '#9FA8DA', '#FFD93D'
+            '#FFEEAD', '#D4A5A5', '#9FA8DA', '#FFD93D',
+            '#A3A847', '#B388FF', '#FFB74D', '#81C784'
         ];
+
+        // Generate summary
+        const workTypeValues = Object.values(workTypeData);
+        const workTypeLabels = Object.keys(workTypeData);
+        const workTypeTotal = workTypeValues.reduce((a, b) => a + b, 0);
+
+        // Create labels with percentage
+        const workTypeLabelsWithPercent = workTypeLabels.map((type, i) => {
+            const percent = workTypeTotal > 0 ? ((workTypeValues[i] / workTypeTotal) * 100).toFixed(1) : 0;
+            return `${type} (${percent}%)`;
+        });
 
         const ctx = document.getElementById('workTypeChart').getContext('2d');
         new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: Object.keys(workTypeCounts),
+                labels: workTypeLabelsWithPercent,
                 datasets: [{
-                    data: Object.values(workTypeCounts),
-                    backgroundColor: colors.slice(0, Object.keys(workTypeCounts).length),
+                    data: workTypeValues,
+                    backgroundColor: colors.slice(0, workTypeLabels.length),
                     borderWidth: 2,
                     borderColor: '#ffffff'
                 }]
@@ -104,23 +125,30 @@ async function createWorkTypeChart() {
                     legend: {
                         position: 'right',
                         labels: {
-                            padding: 20,
-                            generateLabels: (chart) => {
-                                const data = chart.data;
-                                const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                return data.labels.map((label, i) => ({
-                                    text: `${label} (${((data.datasets[0].data[i] / total) * 100).toFixed(1)}%)`,
-                                    fillStyle: data.datasets[0].backgroundColor[i],
-                                    strokeStyle: '#fff',
-                                    lineWidth: 2,
-                                    hidden: false
-                                }));
+                            padding: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const percent = workTypeTotal > 0 ? ((value / workTypeTotal) * 100).toFixed(1) : 0;
+                                return `${context.label}: ₹${value.toLocaleString('en-IN')} (${percent}%)`;
                             }
                         }
                     }
                 }
             }
         });
+
+        // Generate summary
+        const workTypeNames = Object.entries(workTypeData)
+            .map(([type, amt]) => `${type}: ₹${amt >= 1e7 ? (amt / 1e7).toFixed(2) + ' Cr' : (amt / 1e5).toFixed(2) + ' Lakh'}`)
+            .join(', ');
+        document.getElementById('workTypeChartSummary').innerHTML = `
+            <strong>Analysis:</strong> Work type-wise allocation.<br>
+            <span style="font-size:0.97em;">${workTypeNames}</span>
+        `;
     } catch (error) {
         console.error('Error creating work type chart:', error);
     }
@@ -185,6 +213,15 @@ async function createSchemeChart() {
                 }
             }
         });
+
+        // Generate summary
+        const schemeNames = Object.entries(schemeData)
+            .map(([scheme, amt]) => `${scheme}: ₹${(amt / 1e7).toFixed(2)} Cr`)
+            .join(', ');
+        document.getElementById('schemeChartSummary').innerHTML = `
+            <strong>Analysis:</strong> Scheme-wise allocation.<br>
+            <span style="font-size:0.97em;">${schemeNames}</span>
+        `;
     } catch (error) {
         console.error('Error creating scheme chart:', error);
     }
