@@ -43,25 +43,28 @@
         <section id="dashboard" class="tab-content active">
             <h2 >Dashboard Overview</h2>
             <div class="charts-container">
-                <div class="chart-wrapper">
-                    <div class="chart-container">
-                        <canvas id="talukaChart" width="400" height="320"></canvas>
-                    </div>
-                    <div id="talukaChartSummary" class="chart-summary"></div>
-                </div>
-                <div class="chart-wrapper">
-                    <div class="chart-container">
-                        <canvas id="workTypeChart" width="400" height="320"></canvas>
-                    </div>
-                    <div id="workTypeChartSummary" class="chart-summary"></div>
-                </div>
-                <div class="chart-wrapper">
-                    <div class="chart-container">
-                        <canvas id="schemeChart" width="400" height="320"></canvas>
-                    </div>
-                    <div id="schemeChartSummary" class="chart-summary"></div>
-                </div>
-            </div>
+    <div class="chart-wrapper">
+        <h3 class="chart-title"><u>Taluka Fund Allocation</u></h3>
+        <div class="chart-container">
+            <canvas id="talukaChart" width="400" height="320"></canvas>
+        </div>
+        <div id="talukaChartSummary" class="chart-summary"></div>
+    </div>
+    <div class="chart-wrapper">
+        <h3 class="chart-title"><u>Work Type Fund Distribution</u></h3>
+        <div class="chart-container">
+            <canvas id="workTypeChart" width="400" height="320"></canvas>
+        </div>
+        <div id="workTypeChartSummary" class="chart-summary"></div>
+    </div>
+    <div class="chart-wrapper">
+        <h3 class="chart-title"><u>Scheme Wise Fund Allocation</u></h3>
+        <div class="chart-container">
+            <canvas id="schemeChart" width="400" height="320"></canvas>
+        </div>
+        <div id="schemeChartSummary" class="chart-summary"></div>
+    </div>
+</div>
         </section>
         <section id="reports" class="tab-content" style="display: none;">
             <!-- Report Type Selection -->
@@ -261,3 +264,4 @@
     <script type="module" src="app.js"></script>
 </body>
 </html>
+
