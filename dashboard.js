@@ -66,7 +66,7 @@ async function createTalukaChart() {
             .map(([taluka, amt]) => `${taluka}: ₹${(amt / 1e7).toFixed(2)} Cr`)
             .join('</br>');
         document.getElementById('talukaChartSummary').innerHTML = `
-            <strong><u><center>Allocation(in Crores):</u></strong>
+            <strong><u><center>Taluka wise Allocation details(in Crores)</u></strong>
             <span style="font-size:0.97em;">${talukaNames}</span></center>
         `;
     } catch (error) {
@@ -144,10 +144,10 @@ async function createWorkTypeChart() {
         // Generate summary
         const workTypeNames = Object.entries(workTypeData)
             .map(([type, amt]) => `${type}: ₹${amt >= 1e7 ? (amt / 1e7).toFixed(2) + ' Cr' : (amt / 1e5).toFixed(2) + ' Lakh'}`)
-            .join(', ');
+            .join('<br/>');
         document.getElementById('workTypeChartSummary').innerHTML = `
-            <strong><u>Analysis:</u></strong> 
-            <span style="font-size:0.97em;">${workTypeNames}</span>
+            <strong><u><center>Weightage of work-Type(in Figures)</u></strong> 
+            <span style="font-size:0.97em;">${workTypeNames} </span></center>
         `;
     } catch (error) {
         console.error('Error creating work type chart:', error);
@@ -219,11 +219,12 @@ async function createSchemeChart() {
             .map(([scheme, amt]) => `${scheme}: ₹${(amt / 1e7).toFixed(2)} Cr`)
             .join('<br/>');
         document.getElementById('schemeChartSummary').innerHTML = `
-            <strong><u>Analysis:</u></strong> 
-            <span style="font-size:0.97em;">${schemeNames}</span>
+            <strong><u><center>Grant wise Allocation details(in Crores)</u></strong> 
+            <span style="font-size:0.97em;">${schemeNames}</span></center>
         `;
     } catch (error) {
         console.error('Error creating scheme chart:', error);
     }
 }
+
 
