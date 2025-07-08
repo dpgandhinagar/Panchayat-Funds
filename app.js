@@ -114,18 +114,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!data.length) {
             container.style.display = 'none';
             alert('No records found.');
+            // Remove previous total if present
+            const prevTotal = document.getElementById('pendencyTotalCount');
+            if (prevTotal) prevTotal.remove();
             return;
         }
         container.style.display = 'block';
 
-        // Sort by work_id ascending
+        // Sort by work_id ascending (numerically)
         data.sort((a, b) => {
-            // If work_id is numeric
-            if (!isNaN(a.work_id) && !isNaN(b.work_id)) {
-                return Number(a.work_id) - Number(b.work_id);
-            }
-            // If work_id is string
-            return String(a.work_id).localeCompare(String(b.work_id));
+            const numA = parseInt(a.work_id.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.work_id.replace(/\D/g, '')) || 0;
+            return numA - numB;
         });
 
         data.forEach(row => {
@@ -146,6 +146,18 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             body.appendChild(tr);
         });
+
+        // Remove previous total if present
+        const prevTotal = document.getElementById('pendencyTotalCount');
+        if (prevTotal) prevTotal.remove();
+
+        // Show total count below the table
+        const totalDiv = document.createElement('div');
+        totalDiv.id = 'pendencyTotalCount';
+        totalDiv.style.margin = '16px 0 0 0';
+        totalDiv.style.fontWeight = 'bold';
+        totalDiv.textContent = `Total No. of pending entries: ${data.length}`;
+        container.appendChild(totalDiv);
     }
 
     document.getElementById('printPendencyReport').addEventListener('click', function() {
@@ -282,4 +294,3 @@ function formatDate(dateString) {
         year: 'numeric' // <-- Use full year
     }).replace(/\//g, '-');
 }
-
