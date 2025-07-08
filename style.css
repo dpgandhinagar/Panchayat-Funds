@@ -311,6 +311,15 @@ footer {
     font-size: 1.04em;
 }
 
+.chart-title {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.18em;
+    color: #1a237e;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
 @media (max-width: 1100px) {
     .charts-container {
         flex-direction: column;
@@ -642,3 +651,4 @@ footer {
 #pendencyFilter {
     display: block !important;
 }
+
