@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div><strong>Taluka:</strong> ${data.taluka_name}</div>
                     <div><strong>Village:</strong> ${data.village_name}</div>
                     <div><strong>Amount:</strong> ₹${data.amount}</div>
-                    <div><strong>Date of Submission:</strong> ${data.date_of_submission}</div>
+                    <div><strong>Date of Submission:</strong> ${formatDateDMY(data.date_of_submission)}</div>
                 </div>
                 <form id="accountsPaymentForm" class="styled-form">
                     <div class="form-group">
@@ -263,10 +263,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div><strong>Village:</strong> ${data.village_name}</div>
                     <div><strong>Amount:</strong> ₹${data.amount}</div>
                     <div><strong>Branch Name:</strong> ${data.branch_name || '-'}</div>
-                    <div><strong>Date of Submission:</strong> ${data.date_of_submission}</div>
+                    <div><strong>Date of Submission:</strong> ${formatDateDMY(data.date_of_submission)}</div>
                     <div><strong>Cheque Number (Bill):</strong> ${data.cheque_number_bill || '-'}</div>
                     <div><strong>Cheque Number (Labour Cess):</strong> ${data.cheque_number_labour_cess || '-'}</div>
-                    <div><strong>Date of Issue of Cheque:</strong> ${data.date_of_issue_of_cheque || '-'}</div>
+                    <div><strong>Date of Issue of Cheque:</strong> ${formatDateDMY(data.date_of_issue_of_cheque)}</div>
                 </div>
             </div>
         `;
@@ -292,3 +292,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+function formatDateDMY(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+}
