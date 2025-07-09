@@ -56,6 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     <input type="text" name="praisa_bill_number" required>
                 </div>
                 <div class="form-group">
+                    <label>Branch Name</label>
+                    <select name="branch_name" required>
+                        <option value="">Select Branch</option>
+                        <option value="Panchayat">Panchayat</option>
+                        <option value="Vikas">Vikas</option>
+                        <option value="Vikas">Vikas</option>
+                        <option value="RoadsAndBuilding">RoadsAndBuilding</option>
+                        <option value="Establishment">Establishment</option>
+                        <option value="Revenue">Revenue</option>
+                        <option value="Education">Education</option>
+                        <option value="Irrigation-1">Irrigation-1</option>
+                        <option value="Irrigation-2">Irrigation-2</option>
+                        <option value="ICDS">ICDS</option>
+                        <option value="Health">Health</option>
+                        <option value="Statistics">Statistics</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>Subject</label>
                     <input type="text" name="subject" required>
                 </div>
@@ -141,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const form = e.target;
         const formData = Object.fromEntries(new FormData(form));
+        // formData will now include branch_name
         const { error } = await supabase.from('payments').insert([formData]);
         document.getElementById('generalPaymentMsg').textContent = error ? error.message : 'Submitted!';
         if (!error) form.reset();
@@ -242,6 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div><strong>Taluka:</strong> ${data.taluka_name}</div>
                     <div><strong>Village:</strong> ${data.village_name}</div>
                     <div><strong>Amount:</strong> ₹${data.amount}</div>
+                    <div><strong>Branch Name:</strong> ${data.branch_name || '-'}</div>
                     <div><strong>Date of Submission:</strong> ${data.date_of_submission}</div>
                     <div><strong>Cheque Number (Bill):</strong> ${data.cheque_number_bill || '-'}</div>
                     <div><strong>Cheque Number (Labour Cess):</strong> ${data.cheque_number_labour_cess || '-'}</div>
