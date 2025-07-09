@@ -289,6 +289,9 @@ function populateEditForm(data) {
             <option value="finance_commission" ${data.scheme === 'finance_commission' ? 'selected' : ''}>Finance Commission Scheme</option>
             <option value="stamp_duty" ${data.scheme === 'stamp_duty' ? 'selected' : ''}>Stamp Duty Scheme</option>
             <option value="sand_gravel" ${data.scheme === 'sand_gravel' ? 'selected' : ''}>Sand Gravel Scheme</option>
+            <option value="President" ${data.scheme === 'President' ? 'selected' : ''}>President DP Grant</option>
+            <option value="Vice-President" ${data.scheme === 'Vice-President' ? 'selected' : ''}>Vice President DP Grant</option>
+            <option value="Exec chairman" ${data.scheme === 'Exec chairman' ? 'selected' : ''}>Executive Chairman DP Grant</option>
         </select>
 
         <label for="editYear">Year:</label>
