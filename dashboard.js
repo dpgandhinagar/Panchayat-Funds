@@ -125,7 +125,7 @@ async function createWorkTypeChart() {
                     legend: {
                         position: 'right',
                         labels: {
-                            padding: 20
+                            padding: 15
                         }
                     },
                     tooltip: {
@@ -179,7 +179,10 @@ async function createSchemeChart() {
                     backgroundColor: [
                         '#36b9cc',  // Light Blue
                         '#1cc88a',  // Green
-                        '#f6c23e'   // Yellow
+                        '#f6c23e' ,
+                         '#36b9cc',  // Light Blue
+                        '#1cc88a',  // Green
+                        '#f6c23e'    // Yellow
                     ],
                     borderWidth: 1
                 }]
