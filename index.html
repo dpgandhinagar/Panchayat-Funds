@@ -38,6 +38,7 @@
         <a href="#" class="tab" data-target="reports">Reports</a>
         <a href="data-entry.html" class="tab auth-required" style="display: none;">Data Entry</a>
         <a href="#" class="tab auth-required" data-target="pendencyReports" style="display: none;">Pendency Reports</a>
+        <a href="#" class="tab auth-required" data-target="paymentSection" style="display: none;">Payment Section</a>
     </nav>
     <main>
         <section id="dashboard" class="tab-content active">
@@ -256,6 +257,23 @@
                 </div>
 </div>
 </section>
+        <section id="paymentSection" class="tab-content" style="display: none;">
+            <h2><center><u>Payment Section</center></u></h2>
+            <div class="payment-tabs">
+                <button id="generalBranchTab" class="report-tab"><center>General Branch Submission</center></button>
+                <button id="accountsBranchTab" class="report-tab"><center>Accounts Branch Submission</center></button>
+                <button id="searchDetailsTab" class="report-tab"><center>Search Details</center></button></div>
+            </div>
+            <div id="generalBranchForm" class="payment-form">
+                <!-- General Branch Form will be rendered here -->
+            </div>
+            <div id="accountsBranchForm" class="payment-form" style="display:none;">
+                <!-- Accounts Branch Form will be rendered here -->
+            </div>
+            <div id="searchDetailsForm" class="payment-form" style="display:none;">
+                <!-- Search Details Form will be rendered here -->
+            </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2025 An Initiative by District Panchayat, Gandhinagar. All rights reserved.</p>
@@ -264,5 +282,6 @@
     <script type="module" src="dashboard.js"></script>
     <script type="module" src="reports.js"></script>
     <script type="module" src="app.js"></script>
+    <script type="module" src="payment.js"></script>
 </body>
 </html>
