@@ -138,8 +138,7 @@ async function createWorkTypeChart() {
                         }
                     }
                 }
-            }
-        });
+            }});
 
         // Generate summary
         const workTypeNames = Object.entries(workTypeData)
@@ -155,79 +154,113 @@ async function createWorkTypeChart() {
 }
 
 async function createSchemeChart() {
-    try {
-        const { data, error } = await supabase
-            .from('work_details')
-            .select('scheme, amount');
+  // 1. Define all the schemes as they appear in your DB
+  const allSchemes = [
+    'finance_commission',
+    'stamp_duty',
+    'sand_gravel',
+    'President',
+    'Vice-President',
+    'Exec chairman'
+  ];
+  const schemeDisplayNames = {
+    finance_commission: 'Finance Commission',
+    stamp_duty: 'Stamp Duty',
+    sand_gravel: 'Sand & Gravel',
+    President: 'President',
+    'Vice-President': 'Vice President',
+    'Exec chairman': 'Executive Chairman'
+  };
 
-        if (error) throw error;
+  // 2. Fetch ALL rows via pagination, since Supabase caps at 1000 per request
+  let allData = [];
+  const pageSize = 1000;
+  let from = 0;
+  let to = pageSize - 1;
+  let moreData = true;
+  while (moreData) {
+    const { data, error } = await supabase
+      .from('work_details')
+      .select('scheme, amount')
+      .in('scheme', allSchemes)
+      .range(from, to);
 
-        // Aggregate data by scheme
-        const schemeData = data.reduce((acc, curr) => {
-            acc[curr.scheme] = (acc[curr.scheme] || 0) + parseFloat(curr.amount || 0);
-            return acc;
-        }, {});
-
-        const ctx = document.getElementById('schemeChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(schemeData),
-                datasets: [{
-                    label: 'Total Amount (₹)',
-                    data: Object.values(schemeData),
-                    backgroundColor: [
-                        '#36b9cc',  // Light Blue
-                        '#1cc88a',  // Green
-                        '#f6c23e' ,
-                         '#36b9cc',  // Light Blue
-                        '#1cc88a',  // Green
-                        '#f6c23e'    // Yellow
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                indexAxis: 'y',  // This makes the bars horizontal
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: (value) => '₹' + value.toLocaleString('en-IN')
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false  // Hide legend since we have labels on Y axis
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => {
-                                const value = context.raw;
-                                const total = Object.values(schemeData).reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `₹${value.toLocaleString('en-IN')} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Generate summary
-        const schemeNames = Object.entries(schemeData)
-            .map(([scheme, amt]) => `${scheme}: ₹${(amt / 1e7).toFixed(2)} Cr`)
-            .join('<br/>');
-        document.getElementById('schemeChartSummary').innerHTML = `
-            <strong><u><center>Grant wise Allocation details(in Crores)</u></strong> 
-            <span style="font-size:0.97em;">${schemeNames}</span></center>
-        `;
-    } catch (error) {
-        console.error('Error creating scheme chart:', error);
+    if (error) {
+      console.error('Supabase error:', error);
+      document.getElementById('schemechartsummary').innerHTML = "<span style='color: red;'>Error fetching scheme data.</span>";
+      return;
     }
+
+    allData = allData.concat(data);
+    if (!data || data.length < pageSize) {
+      moreData = false; // last page
+    } else {
+      from += pageSize;
+      to += pageSize;
+    }
+  }
+
+  // 3. Aggregate totals per scheme
+  const schemeTotals = {};
+  allSchemes.forEach(scheme => { schemeTotals[scheme] = 0; });
+  allData.forEach(row => {
+    // Defensive: trim whitespace, convert amount to number
+    const schemeKey = (row.scheme || '').trim();
+    const amt = Number(row.amount) || 0;
+    if (schemeTotals.hasOwnProperty(schemeKey)) {
+      schemeTotals[schemeKey] += amt;
+    }
+  });
+
+  // 4. Prepare chart data
+  const labels = allSchemes.map(s => schemeDisplayNames[s]);
+  const values = allSchemes.map(s => schemeTotals[s]);
+
+  // 5. Destroy previous chart if any
+  if (window.schemeChart && typeof window.schemeChart.destroy === "function") {
+    window.schemeChart.destroy();
+    window.schemeChart = undefined;
+  }
+
+  // 6. Draw the horizontal bar chart
+  const ctx = document.getElementById('schemeChart').getContext('2d');
+  window.schemeChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Scheme Amount',
+        data: values,
+        backgroundColor: [
+          '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc949'
+        ]
+      }]
+    },
+    options: {
+      indexAxis: 'y', // <--- This makes the chart horizontal
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+       
+      },
+      scales: {
+        x: { beginAtZero: true }
+      }
+    }
+  });
+
+  // 7. Show the scheme summary below in crores (cr)
+  function formatAmountCr(amount) {
+    const cr = amount / 1e7;
+    return cr.toLocaleString('en-IN', { maximumFractionDigits: 2 }) + ' cr';
+  }
+  let descHTML = '<ul style="list-style: none; padding-left: 0; font-size: 0.9em;">';
+  allSchemes.forEach(scheme => {
+    descHTML += `<li>${schemeDisplayNames[scheme]}: ${formatAmountCr(schemeTotals[scheme])}</li>`;
+  });
+  descHTML += '</ul>';
+  document.getElementById('schemechartsummary').innerHTML =' <strong><u><center>Scheme wise Allocation of Funds(in crores)</u></strong>'+descHTML;
 }
 
-
+// Call after DOM loaded!
+document.addEventListener('DOMContentLoaded', createSchemeChart);
