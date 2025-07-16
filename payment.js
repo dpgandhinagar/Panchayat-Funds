@@ -30,16 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
     paymentSection.appendChild(searchDetailsDiv);
 
      const username = getCurrentUsername();
-    if (username === 'admin' || username === 'accounts-br') {
+    if (username === 'admin' ) {
         accountsTab.style.display = '';
         generalRegisterTab.style.display = '';
         searchRegisterTab.style.display ='';
-    } else {
+    } else if(username === 'accounts-br')
+        {accountsTab.style.display = '';
+            generalRegisterTab.style.display = 'none';
+        searchRegisterTab.style.display ='none';
+         generalTab.style.display ='none';
+
+        }
+    else {
         accountsTab.style.display = 'none';
         generalRegisterTab.style.display = 'none';
         searchRegisterTab.style.display ='none';
     }
-
     // Remove or comment out this line:
     // const paymentTabs = document.querySelector('.payment-tabs');
     // paymentTabs.innerHTML += `<button id="searchDetailsTab" class="payment-tab">Search Details</button>`;
