@@ -336,7 +336,7 @@ footer {
 
 /* Reports styles */
 .reports-tabs {
-    display: flex;
+   display: flex;
     justify-content: center;
     gap: 15px;
     margin-bottom: 30px;
@@ -661,6 +661,16 @@ footer {
     max-width: 480px;
 }
 
+.dorm-section {
+    background: #f8f6f6;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 32px 24px 24px 24px;
+    margin: 24px auto;
+    max-width: 480px;
+    max-height: 200px;
+}
+
 .styled-form .form-group {
     margin-bottom: 18px;
     display: flex;
@@ -699,7 +709,7 @@ footer {
     font-weight: 600;
     cursor: pointer;
     margin-top: 10px;
-    width: 100%;
+    width:100%;
     transition: background 0.2s;
 }
 
@@ -717,7 +727,7 @@ footer {
 
 .payment-tabs {
     display: flex;
-    justify-content: center;
+   justify-content: center;
     gap: 15px;
     margin-bottom: 30px;
 }
@@ -758,5 +768,32 @@ footer {
     }
 }
 
+
+
+.results-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1em 0;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 1em;
+}
+.results-table th, .results-table td {
+    border: 1px solid #ccc;
+    padding: 7px;
+    text-align: left;
+}
+.results-table th {
+    background: #2980b9;
+    color: #fff;
+}
+.total-row {
+    background: #f0f7ff;
+    font-weight: bold;
+}
 
 
