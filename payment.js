@@ -1,23 +1,56 @@
 import { supabase } from './supabase-client.js';
 
+function getCurrentUsername() {
+    try {
+        const session = JSON.parse(sessionStorage.getItem('auth_session'));
+        return session?.username || '';
+    } catch { return ''; }
+}
 document.addEventListener('DOMContentLoaded', () => {
     // Tab switching
     const generalTab = document.getElementById('generalBranchTab');
     const accountsTab = document.getElementById('accountsBranchTab');
+    const searchDetailsTab = document.getElementById('searchDetailsTab');
+    const generalRegisterTab = document.getElementById('generalRegisterTab');
+    const searchRegisterTab = document.getElementById('searchRegisterTab');
+
+
     const generalForm = document.getElementById('generalBranchForm');
     const accountsForm = document.getElementById('accountsBranchForm');
+    const searchDetailsForm = document.getElementById('searchDetailsForm');
+     const generalRegisterForm = document.getElementById('generalRegisterForm');
+    const searchRegisterForm = document.getElementById('searchRegisterForm');
+     
+    const paymentSection = document.getElementById('paymentSection');
+
+    const searchDetailsDiv = document.createElement('div');
+    searchDetailsDiv.id = 'searchDetailsForm';
+    searchDetailsDiv.className = 'payment-form';
+    searchDetailsDiv.style.display = 'none';
+    paymentSection.appendChild(searchDetailsDiv);
+
+     const username = getCurrentUsername();
+    if (username === 'admin' || username === 'accounts-br') {
+        accountsTab.style.display = '';
+        generalRegisterTab.style.display = '';
+        searchRegisterTab.style.display ='';
+    } else {
+        accountsTab.style.display = 'none';
+        generalRegisterTab.style.display = 'none';
+        searchRegisterTab.style.display ='none';
+    }
 
     // Remove or comment out this line:
     // const paymentTabs = document.querySelector('.payment-tabs');
     // paymentTabs.innerHTML += `<button id="searchDetailsTab" class="payment-tab">Search Details</button>`;
 
     // Add a new form container for Search Details
-    const paymentSection = document.getElementById('paymentSection');
+   /* const paymentSection = document.getElementById('paymentSection');
     const searchDetailsDiv = document.createElement('div');
     searchDetailsDiv.id = 'searchDetailsForm';
     searchDetailsDiv.className = 'payment-form';
     searchDetailsDiv.style.display = 'none';
-    paymentSection.appendChild(searchDetailsDiv);
+    paymentSection.appendChild(searchDetailsDiv);*/
 
     // Tab switching logic (add for new tab)
     // const searchTab = document.getElementById('searchDetailsTab');
@@ -29,22 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
     //     accountsForm.style.display = 'none';
     //     searchDetailsDiv.style.display = '';
     // });
-    generalTab.addEventListener('click', () => {
-        generalTab.classList.add('active');
-        accountsTab.classList.remove('active');
-        // searchTab.classList.remove('active');
-        generalForm.style.display = '';
-        accountsForm.style.display = 'none';
-        searchDetailsDiv.style.display = 'none';
+    const tabFormPairs = [
+        { tab: generalTab, form: generalForm },
+        { tab: accountsTab, form: accountsForm },
+        { tab: searchDetailsTab, form: searchDetailsForm },
+        { tab: generalRegisterTab, form: generalRegisterForm },
+        { tab: searchRegisterTab, form: searchRegisterForm }
+    ];
+
+    tabFormPairs.forEach(({ tab, form }) => {
+        tab.addEventListener('click', () => {
+            tabFormPairs.forEach(({ tab: t, form: f }) => {
+                t.classList.remove('active');
+                f.style.display = 'none';
+            });
+            tab.classList.add('active');
+            form.style.display = '';
+        });
     });
-    accountsTab.addEventListener('click', () => {
-        accountsTab.classList.add('active');
-        generalTab.classList.remove('active');
-        // searchTab.classList.remove('active');
-        accountsForm.style.display = '';
-        generalForm.style.display = 'none';
-        searchDetailsDiv.style.display = 'none';
-    });
+
 
     // Render General Branch Form
     generalForm.innerHTML = `
@@ -271,15 +307,168 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     });
+    
+    
+    
+    // --- Render General Register Table
+    generalRegisterForm.innerHTML = `
+        <div >
+            <h3><u><center>All Payment Entries (General Register)</center></u></h3>
+            <div id="generalRegisterTableContainer"></div>
+        </div>
+    `;
+    generalRegisterTab.addEventListener('click', async () => {
+        renderPaymentsTable('generalRegisterTableContainer');
+    });
+  // --- Render Search Register Form
+   searchRegisterForm.innerHTML = `
+        
+            <h3><center><strong><u>Search Payment-Details by Date</u></strong></center></h3>
+            <form id="searchRegisterFormInner" class="styled-form">
+                
+                    <label><center>From Date</label>
+                    <input type="date"   name="from_date" required>
+                
+             
+                    <label>To Date</label>
+                    <input type="date" name="to_date" required></center>
+               
+                <center><button type="submit" class="submit-btn">Show Register</button></center>
+            </form>
+            <div id="searchRegisterResults"></div>
+        
+    `;
+    document.getElementById('searchRegisterFormInner').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const from = e.target.from_date.value;
+        const to = e.target.to_date.value;
+        if (!from || !to) return;
+        
+    // Hide the form section
+    //e.target.style.display = 'none'; // This hides the <div class="form-section"> containing the form
 
-    // Tab switching logic for all payment tabs
+        await renderPaymentsTable('searchRegisterResults', from, to);
+    });
+
+    // --- Table Rendering Function (used by both registers)
+    async function renderPaymentsTable(containerId, fromDate = null, toDate = null) {
+        const tableContainer = document.getElementById(containerId);
+        tableContainer.innerHTML = '<div>Loading...</div>';
+        let query = supabase.from('payments').select('*');
+        if (fromDate && toDate) {
+            query = query.gte('date_of_submission', fromDate).lte('date_of_submission', toDate);
+        }
+        const { data, error } = await query.order('date_of_submission', { ascending: true });
+        if (error || !data || data.length === 0) {
+            tableContainer.innerHTML = '<div>No records found.</div>';
+            return;
+        }
+
+        // Table headers (similar look to reports/pendency)
+        let html = `
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Bill No</th>
+                        <th>Branch</th>
+                        <th>Subject</th>
+                        <th>Taluka</th>
+                        <th>Village</th>
+                        <th>Amount</th>
+                        <th>Date of Submission</th>
+                        <th>Cheque No (Bill)</th>
+                        <th>Cheque No (Labour Cess)</th>
+                        <th>Date of Cheque Issue</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        let totalAmount = 0;
+        data.forEach(row => {
+            totalAmount += Number(row.amount) || 0;
+            html += `
+                <tr>
+                    <td>${row.praisa_bill_number || ''}</td>
+                    <td>${row.branch_name || '-'}</td>
+                    <td>${row.subject || '-'}</td>
+                    <td>${row.taluka_name || '-'}</td>
+                    <td>${row.village_name || '-'}</td>
+                    <td>₹${row.amount ? Number(row.amount).toLocaleString('en-IN') : '-'}</td>
+                    <td>${formatDateDMY(row.date_of_submission)}</td>
+                    <td>${row.cheque_number_bill || '-'}</td>
+                    <td>${row.cheque_number_labour_cess || '-'}</td>
+                    <td>${formatDateDMY(row.date_of_issue_of_cheque)}</td>
+                </tr>
+            `;
+        });
+        html += `</tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="5" style="text-align:right;"><strong>Total:</strong></td>
+                    <td colspan="5"><strong>₹${totalAmount.toLocaleString('en-IN')}</strong></td>
+                </tr>
+            </tfoot>
+        </table>`;
+
+        // If search register, add summary table
+        if (fromDate && toDate) {
+            // Group by date
+            let summary = {};
+            data.forEach(row => {
+                let date = row.date_of_submission ? row.date_of_submission.split('T')[0] : '';
+                if (!date) return;
+                if (!summary[date]) summary[date] = { bills: 0, cheques: 0 };
+                summary[date].bills += 1;
+                if (row.cheque_number_bill || row.cheque_number_labour_cess) summary[date].cheques += 1;
+            });
+            const dates = Object.keys(summary).sort();
+            let totalBills = 0, totalCheques = 0;
+            let summaryHtml = `
+                <h4>Date-wise Summary</h4>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>No. of Bills to Account</th>
+                            <th>No. of Cheques Issued</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            dates.forEach(date => {
+                summaryHtml += `<tr>
+                    <td>${formatDateDMY(date)}</td>
+                    <td>${summary[date].bills}</td>
+                    <td>${summary[date].cheques}</td>
+                </tr>`;
+                totalBills += summary[date].bills;
+                totalCheques += summary[date].cheques;
+            });
+            summaryHtml += `</tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td style="text-align:right;"><strong>Total</strong></td>
+                        <td><strong>${totalBills}</strong></td>
+                        <td><strong>${totalCheques}</strong></td>
+                    </tr>
+                </tfoot>
+                </table>
+            `;
+            html += summaryHtml;
+        }
+
+        tableContainer.innerHTML = html;
+    }
+});
+
+  /*  // Tab switching logic for all payment tabs
     const tabIds = [
         { tab: 'generalBranchTab', form: 'generalBranchForm' },
         { tab: 'accountsBranchTab', form: 'accountsBranchForm' },
         { tab: 'searchDetailsTab', form: 'searchDetailsForm' }
-    ];
+    ];*/
 
-    tabIds.forEach(({ tab, form }) => {
+   /* tabIds.forEach(({ tab, form }) => {
         document.getElementById(tab).addEventListener('click', () => {
             // Remove 'active' from all tabs and hide all forms
             tabIds.forEach(({ tab: t, form: f }) => {
@@ -291,7 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(form).style.display = '';
         });
     });
-});
+});*/
+
 
 function formatDateDMY(dateStr) {
     if (!dateStr) return '-';
@@ -302,3 +492,4 @@ function formatDateDMY(dateStr) {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
 }
+
