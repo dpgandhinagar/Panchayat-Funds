@@ -260,9 +260,11 @@
         <section id="paymentSection" class="tab-content" style="display: none;">
             <h2><center><u>Payment Section</center></u></h2>
             <div class="payment-tabs">
-                <button id="generalBranchTab" class="report-tab"><center>General Branch Submission</center></button>
-                <button id="accountsBranchTab" class="report-tab"><center>Accounts Branch Submission</center></button>
-                <button id="searchDetailsTab" class="report-tab"><center>Search Details</center></button></div>
+                <button id="generalBranchTab" class="report-tab">General Branch Submission</button>
+                <button id="accountsBranchTab" class="report-tab" style="display:none;">Accounts Branch Submission</button>
+                <button id="searchDetailsTab" class="report-tab">Search Details</button>
+                <button id="generalRegisterTab" class="report-tab">General Register</button>
+                <button id="searchRegisterTab" class="report-tab">Search Register</button>
             </div>
             <div id="generalBranchForm" class="payment-form">
                 <!-- General Branch Form will be rendered here -->
@@ -273,6 +275,8 @@
             <div id="searchDetailsForm" class="payment-form" style="display:none;">
                 <!-- Search Details Form will be rendered here -->
             </div>
+            <div id="generalRegisterForm" class="payment-form" style="display:none;"></div>
+            <div id="searchRegisterForm" class="payment-form" style="display:none;"></div>
         </section>
     </main>
     <footer>
