@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         generalRegisterTab.style.display = 'none';
         searchRegisterTab.style.display ='none';
     }
+
     // Remove or comment out this line:
     // const paymentTabs = document.querySelector('.payment-tabs');
     // paymentTabs.innerHTML += `<button id="searchDetailsTab" class="payment-tab">Search Details</button>`;
@@ -103,8 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <option value="">Select Branch</option>
                         <option value="Panchayat">Panchayat</option>
                         <option value="Vikas">Vikas</option>
-                        <option value="Accounts">Accounts</option>
-                        <option value="Pashupalan">Pashupalan</option>
+                        <option value="Vikas">Vikas</option>
                         <option value="RoadsAndBuilding">RoadsAndBuilding</option>
                         <option value="Establishment">Establishment</option>
                         <option value="Revenue">Revenue</option>
@@ -499,4 +499,3 @@ function formatDateDMY(dateStr) {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
 }
-
