@@ -757,24 +757,24 @@ footer {
         max-width: 98vw;
     }
 }
-.results-container {
+.pesults-container {
     max-width: 1100px;
     margin: 0 auto;
     padding: 1em 0;
 }
 
-.results-table {
+.pesults-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
     margin-bottom: 1em;
 }
-.results-table th, .results-table td {
+.pesults-table th, .pesults-table td {
     border: 1px solid #ccc;
     padding: 7px;
     text-align: left;
 }
-.results-table th {
+.pesults-table th {
     background: #2980b9;
     color: #fff;
 }
