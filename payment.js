@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="form-group">
                     <label>Taluka Name</label>
-                    <select name="taluka_name" id="talukaSelect" required>
+                    <select name="taluka_name" id="talukaSelect" >
                         <option value="">Select Taluka</option>
                         <option value="Gandhinagar">Gandhinagar</option>
                         <option value="Mansa">Mansa</option>
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="form-group">
                     <label>Village Name</label>
-                    <select name="village_name" id="villageSelect" required>
+                    <select name="village_name" id="villageSelect">
                         <option value="">Select Taluka First</option>
                     </select>
                 </div>
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="form-group">
                         <label>Date of Issue of Cheque</label>
-                        <input type="date" name="date_of_issue_of_cheque" value="${new Date().toISOString().split('T')[0]}" required>
+                        <input type="date" name="date_of_issue_of_cheque" value="${new Date().toISOString().split('T')[0]}" required readonly>
                     </div>
                     <button type="submit" class="submit-btn">Submit</button>
                 </form>
