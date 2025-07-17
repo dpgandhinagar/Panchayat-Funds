@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Table headers (similar look to reports/pendency)
         let html = `
-            <table class="results-table">
+            <table class="pesults-table">
                 <thead>
                     <tr>
                         <th>Bill No</th>
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let totalBills = 0, totalCheques = 0;
             let summaryHtml = `
                 <h4>Date-wise Summary</h4>
-                <table class="results-table">
+                <table class="pesults-table">
                     <thead>
                         <tr>
                             <th>Date</th>
