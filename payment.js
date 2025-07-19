@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="accountsDetails"></div>
         </div>
     `;
-
+  
     // Handle Accounts Branch Search
     document.getElementById('accountsSearchForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -360,113 +360,159 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Table Rendering Function (used by both registers)
     async function renderPaymentsTable(containerId, fromDate = null, toDate = null) {
         const tableContainer = document.getElementById(containerId);
-        tableContainer.innerHTML = '<div>Loading...</div>';
-        let query = supabase.from('payments').select('*');
-        if (fromDate && toDate) {
-            query = query.gte('date_of_submission', fromDate).lte('date_of_submission', toDate);
-        }
-        const { data, error } = await query.order('date_of_submission', { ascending: true });
-        if (error || !data || data.length === 0) {
-            tableContainer.innerHTML = '<div>No records found.</div>';
-            return;
-        }
+    tableContainer.innerHTML = '<div>Loading...</div>';
+    let query = supabase.from('payments').select('*');
+    if (fromDate && toDate) {
+        query = query.gte('date_of_submission', fromDate).lte('date_of_submission', toDate);
+    }
+    const { data, error } = await query.order('date_of_submission', { ascending: true });
+    if (error || !data || data.length === 0) {
+        tableContainer.innerHTML = '<div>No records found.</div>';
+        return;
+    }
 
-        // Table headers (similar look to reports/pendency)
-        let html = `
+    // Helper to calculate delay in days
+    function calculateDelay(submit, cheque) {
+        if (!submit || !cheque) return '-';
+        const d1 = new Date(submit.split('T')[0]);
+        const d2 = new Date(cheque.split('T')[0]);
+        if (isNaN(d1) || isNaN(d2)) return '-';
+        const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24))-1;
+        return diff >= 0 ? diff : 0;
+    }
+
+    // Table headers (add Delay in Process)
+    let html = `
+        <table class="pesults-table">
+            <thead>
+                <tr>
+                    <th>Bill No</th>
+                    <th>Branch</th>
+                    <th>Subject</th>
+                    <th>Taluka</th>
+                    <th>Village</th>
+                    <th>Amount</th>
+                    <th>Date of Submission</th>
+                    <th>Cheque No (Bill)</th>
+                    <th>Cheque No (Labour Cess)</th>
+                    <th>Date of Cheque Issue</th>
+                    <th>Delay in Process (days)</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    let totalAmount = 0;
+    const delaySummary = {}; // {delay: count}
+
+    data.forEach(row => {
+        totalAmount += Number(row.amount) || 0;
+        const delay = calculateDelay(row.date_of_submission, row.date_of_issue_of_cheque);
+        if (delay !== '-') {
+            delaySummary[delay] = (delaySummary[delay] || 0) + 1;
+        }
+        html += `
+            <tr>
+                <td>${row.praisa_bill_number || ''}</td>
+                <td>${row.branch_name || '-'}</td>
+                <td>${row.subject || '-'}</td>
+                <td>${row.taluka_name || '-'}</td>
+                <td>${row.village_name || '-'}</td>
+                <td>₹${row.amount ? Number(row.amount).toLocaleString('en-IN') : '-'}</td>
+                <td>${formatDateDMY(row.date_of_submission)}</td>
+                <td>${row.cheque_number_bill || '-'}</td>
+                <td>${row.cheque_number_labour_cess || '-'}</td>
+                <td>${formatDateDMY(row.date_of_issue_of_cheque)}</td>
+                <td>${delay}</td>
+            </tr>
+        `;
+    });
+    html += `</tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="5" style="text-align:right;"><strong>Total:</strong></td>
+                <td colspan="6"><strong>₹${totalAmount.toLocaleString('en-IN')}</strong></td>
+            </tr>
+        </tfoot>
+    </table>`;
+
+    // If search register, add summary table AND delay summary
+    if (fromDate && toDate) {
+        // --- Date-wise summary (existing code)
+        let summary = {};
+        data.forEach(row => {
+            let date = row.date_of_submission ? row.date_of_submission.split('T')[0] : '';
+            if (!date) return;
+            if (!summary[date]) summary[date] = { bills: 0, cheques: 0 };
+            summary[date].bills += 1;
+            if (row.cheque_number_bill || row.cheque_number_labour_cess) summary[date].cheques += 1;
+        });
+        const dates = Object.keys(summary).sort();
+        let totalBills = 0, totalCheques = 0;
+        let summaryHtml = `
+            <h4>Date-wise Summary</h4>
             <table class="pesults-table">
                 <thead>
                     <tr>
-                        <th>Bill No</th>
-                        <th>Branch</th>
-                        <th>Subject</th>
-                        <th>Taluka</th>
-                        <th>Village</th>
-                        <th>Amount</th>
-                        <th>Date of Submission</th>
-                        <th>Cheque No (Bill)</th>
-                        <th>Cheque No (Labour Cess)</th>
-                        <th>Date of Cheque Issue</th>
+                        <th>Date</th>
+                        <th>No. of Bills to Account</th>
+                        <th>No. of Cheques Issued</th>
                     </tr>
                 </thead>
                 <tbody>
         `;
-        let totalAmount = 0;
-        data.forEach(row => {
-            totalAmount += Number(row.amount) || 0;
-            html += `
-                <tr>
-                    <td>${row.praisa_bill_number || ''}</td>
-                    <td>${row.branch_name || '-'}</td>
-                    <td>${row.subject || '-'}</td>
-                    <td>${row.taluka_name || '-'}</td>
-                    <td>${row.village_name || '-'}</td>
-                    <td>₹${row.amount ? Number(row.amount).toLocaleString('en-IN') : '-'}</td>
-                    <td>${formatDateDMY(row.date_of_submission)}</td>
-                    <td>${row.cheque_number_bill || '-'}</td>
-                    <td>${row.cheque_number_labour_cess || '-'}</td>
-                    <td>${formatDateDMY(row.date_of_issue_of_cheque)}</td>
-                </tr>
-            `;
+        dates.forEach(date => {
+            summaryHtml += `<tr>
+                <td>${formatDateDMY(date)}</td>
+                <td>${summary[date].bills}</td>
+                <td>${summary[date].cheques}</td>
+            </tr>`;
+            totalBills += summary[date].bills;
+            totalCheques += summary[date].cheques;
         });
-        html += `</tbody>
+        summaryHtml += `</tbody>
             <tfoot>
                 <tr class="total-row">
-                    <td colspan="5" style="text-align:right;"><strong>Total:</strong></td>
-                    <td colspan="5"><strong>₹${totalAmount.toLocaleString('en-IN')}</strong></td>
+                    <td style="text-align:right;"><strong>Total</strong></td>
+                    <td><strong>${totalBills}</strong></td>
+                    <td><strong>${totalCheques}</strong></td>
                 </tr>
             </tfoot>
-        </table>`;
+            </table>
+        `;
 
-        // If search register, add summary table
-        if (fromDate && toDate) {
-            // Group by date
-            let summary = {};
-            data.forEach(row => {
-                let date = row.date_of_submission ? row.date_of_submission.split('T')[0] : '';
-                if (!date) return;
-                if (!summary[date]) summary[date] = { bills: 0, cheques: 0 };
-                summary[date].bills += 1;
-                if (row.cheque_number_bill || row.cheque_number_labour_cess) summary[date].cheques += 1;
-            });
-            const dates = Object.keys(summary).sort();
-            let totalBills = 0, totalCheques = 0;
-            let summaryHtml = `
-                <h4>Date-wise Summary</h4>
-                <table class="pesults-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>No. of Bills to Account</th>
-                            <th>No. of Cheques Issued</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            dates.forEach(date => {
-                summaryHtml += `<tr>
-                    <td>${formatDateDMY(date)}</td>
-                    <td>${summary[date].bills}</td>
-                    <td>${summary[date].cheques}</td>
-                </tr>`;
-                totalBills += summary[date].bills;
-                totalCheques += summary[date].cheques;
-            });
-            summaryHtml += `</tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td style="text-align:right;"><strong>Total</strong></td>
-                        <td><strong>${totalBills}</strong></td>
-                        <td><strong>${totalCheques}</strong></td>
+        // --- Delay summary table
+        let delayHtml = `
+            <h4>Delay Summary (in Days)</h4>
+            <table class="pesults-table">
+                <thead>
+                    <tr>
+                        <th>Delay (days)</th>
+                        <th>No. of Bills</th>
                     </tr>
-                </tfoot>
-                </table>
-            `;
-            html += summaryHtml;
+                </thead>
+                <tbody>
+        `;
+        // Sort delays numerically, '-' last
+        Object.keys(delaySummary).sort((a, b) => Number(a) - Number(b)).forEach(delay => {
+            delayHtml += `<tr>
+                <td>${delay}</td>
+                <td>${delaySummary[delay]}</td>
+            </tr>`;
+        });
+        delayHtml += `
+                </tbody>
+            </table>
+        `;
+
+        html += summaryHtml + delayHtml;
+    }
+
+    tableContainer.innerHTML = html;
         }
 
         tableContainer.innerHTML = html;
     }
-});
+);
 
   /*  // Tab switching logic for all payment tabs
     const tabIds = [
