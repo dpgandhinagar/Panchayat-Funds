@@ -449,8 +449,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const dates = Object.keys(summary).sort();
         let totalBills = 0, totalCheques = 0;
         let summaryHtml = `
-            <h4>Date-wise Summary</h4>
-            <table class="pesults-table">
+            <h4><center><strong><u>Date-wise Summary</u></strong></center></h4>
+            <table class="cesults-table" align="center">
                 <thead>
                     <tr>
                         <th>Date</th>
@@ -482,8 +482,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Delay summary table
         let delayHtml = `
-            <h4>Delay Summary (in Days)</h4>
-            <table class="pesults-table">
+            <h4><center><strong><u>Delay Summary (in Days)</u></strong></center></h4>
+            <table class="cesults-table" align="center">
                 <thead>
                     <tr>
                         <th>Delay (days)</th>
@@ -545,3 +545,4 @@ function formatDateDMY(dateStr) {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
 }
+
