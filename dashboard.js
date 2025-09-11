@@ -17,14 +17,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function createTalukaChart() {
     try {
-        const { data, error } = await supabase
-            .from('work_details')
-            .select('taluka_name, amount');
-
-        if (error) throw error;
+        // PAGINATE to fetch all rows
+        let allData = [];
+        const pageSize = 1000;
+        let from = 0;
+        let to = pageSize - 1;
+        let moreData = true;
+        while (moreData) {
+            const { data, error } = await supabase
+                .from('work_details')
+                .select('taluka_name, amount')
+                .range(from, to);
+            if (error) throw error;
+            allData = allData.concat(data);
+            if (!data || data.length < pageSize) {
+                moreData = false;
+            } else {
+                from += pageSize;
+                to += pageSize;
+            }
+        }
 
         // Aggregate data by taluka
-        const talukaData = data.reduce((acc, curr) => {
+        const talukaData = allData.reduce((acc, curr) => {
             acc[curr.taluka_name] = (acc[curr.taluka_name] || 0) + parseFloat(curr.amount || 0);
             return acc;
         }, {});
@@ -76,14 +91,29 @@ async function createTalukaChart() {
 
 async function createWorkTypeChart() {
     try {
-        const { data, error } = await supabase
-            .from('work_details')
-            .select('work_type, amount');
-
-        if (error) throw error;
+        // PAGINATE to fetch all rows
+        let allData = [];
+        const pageSize = 1000;
+        let from = 0;
+        let to = pageSize - 1;
+        let moreData = true;
+        while (moreData) {
+            const { data, error } = await supabase
+                .from('work_details')
+                .select('work_type, amount')
+                .range(from, to);
+            if (error) throw error;
+            allData = allData.concat(data);
+            if (!data || data.length < pageSize) {
+                moreData = false;
+            } else {
+                from += pageSize;
+                to += pageSize;
+            }
+        }
 
         // Aggregate data by work type
-        const workTypeData = data.reduce((acc, curr) => {
+        const workTypeData = allData.reduce((acc, curr) => {
             acc[curr.work_type] = (acc[curr.work_type] || 0) + parseFloat(curr.amount || 0);
             return acc;
         }, {});
