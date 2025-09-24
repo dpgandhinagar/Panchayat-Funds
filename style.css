@@ -1,5 +1,3 @@
-
-
 body {
     margin: 0;
     font-family: 'Roboto', Arial, sans-serif;
@@ -819,3 +817,40 @@ footer {
     background: #f0f7ff;
     font-weight: bold;
 }
+
+.establishment-tabs .estab-tab {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.establishment-tabs .estab-tab.active {
+    background-color: #007BFF;
+    color: white;
+}
+.estab-form {
+    margin: 0 auto;
+    max-width: 700px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 32px 24px 24px 24px;
+}
+/* Add this to your CSS file or inside a <style> tag */
+#eesultsTable th {
+    background-color: #0074D9;
+    color: #fff;
+}
+#eesultsTable {
+    border-collapse: collapse;
+    width: 100%;
+}
+#eesultsTable th, #eesultsTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+#eesultsTable tr:nth-child(even){background-color: #f2f2f2;}
