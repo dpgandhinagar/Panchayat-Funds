@@ -39,6 +39,7 @@
         <a href="data-entry.html" class="tab auth-required" style="display: none;">Data Entry</a>
         <a href="#" class="tab auth-required" data-target="pendencyReports" style="display: none;">Pendency Reports</a>
         <a href="#" class="tab auth-required" data-target="paymentSection" style="display: none;">Payment Section</a>
+        <a href="#" class="tab auth-required" data-target="establishmentSection" style="display: none;">Establishment</a>
     </nav>
     <main>
         <section id="dashboard" class="tab-content active">
@@ -281,6 +282,42 @@
             <div id="generalRegisterForm" class="payment-form" style="display:none;"></div>
             <div id="searchRegisterForm" class="payment-form" style="display:none;"></div>
         </section>
+        <section id="establishmentSection" class="tab-content" style="display: none;">
+    <h2><center><u>Establishment Section</u></center></h2>
+    <div class="establishment-tabs" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 30px;">
+        <button id="cadreDetailsTab" class="estab-tab active">By Cadre Details</button>
+        <button id="ageDetailsTab" class="estab-tab">By Age Details</button>
+        <button id="searchEstabDetailsTab" class="estab-tab">Search Details</button>
+    </div>
+    <div id="cadreDetailsForm" class="filter-content" style="display: block;">
+        <form id="cadreDetailsQueryForm" class="styled-form">
+    <div class="form-group">
+        <label for="cadreSelect">Cadre</label>
+        <select id="cadreSelect" required>
+            <option value="">Select Cadre</option>
+            <option value="tcm">TCM</option>
+            <option value="junior clerk">Junior Clerk</option>
+            <option value="senior clerk">Senior Clerk</option>
+        </select>
+    </div>
+    
+    <button type="submit" class="submit-btn">Show Details</button>
+</form>
+
+    
+
+<div id="cadreDetailsResults" style="display:none;">
+  <div id="cadreDetailsTable"></div>
+</div>
+    <div id="ageDetailsForm" class="estab-form" style="display: none;">
+        <!-- Age Details Content Here -->
+        <div style="text-align:center;">Age Details will be shown here.</div>
+    </div>
+    <div id="searchEstabDetailsForm" class="estab-form" style="display: none;">
+        <!-- Search Details Content Here -->
+        <div style="text-align:center;">Search Details will be shown here.</div>
+    </div>
+</section>
     </main>
     <footer>
         <p>&copy; 2025 An Initiative by District Panchayat, Gandhinagar. All rights reserved.</p>
@@ -290,6 +327,7 @@
     <script type="module" src="reports.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="payment.js"></script>
+    <script type="module" src="esta.js"></script>
 </body>
 </html>
 
